@@ -5,7 +5,7 @@
 
 resource "aws_iam_instance_profile" "ecs-instance-profile" {
     name = "ecs-instance-profile-${terraform.env}"
-    roles = ["${aws_iam_role.ecs-instance-role.name}"]
+    role = "${aws_iam_role.ecs-instance-role.name}"
 }
 
 resource "aws_iam_role" "ecs-instance-role" {
