@@ -13,3 +13,7 @@ output "ecs-instance-profile" {
 output "ecs-service-role" {
   value = "${aws_iam_role.ecs-service-role.name}"
 }
+
+output "ecs-instance-role" {
+  value = "${aws_iam_role.ecs-instance-role.name}"
+}
