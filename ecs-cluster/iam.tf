@@ -4,12 +4,12 @@
  */
 
 resource "aws_iam_instance_profile" "ecs-instance-profile" {
-    name = "ecs-instance-profile-${terraform.env}"
+    name = "ecs-instance-profile-${var.environment}"
     role = "${aws_iam_role.ecs-instance-role.name}"
 }
 
 resource "aws_iam_role" "ecs-instance-role" {
-    name = "ecs-instance-role-${terraform.env}"
+    name = "ecs-instance-role-${var.environment}"
     assume_role_policy = <<EOF
 {
   "Version": "2008-10-17",
@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "ecs-instance-role-policy-attach" {
  */
 
  resource "aws_iam_role" "ecs-service-role" {
-     name = "ecs-service-role-${terraform.env}"
+     name = "ecs-service-role-${var.environment}"
      assume_role_policy = <<EOF
 {
  "Version": "2008-10-17",
