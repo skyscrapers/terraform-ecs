@@ -18,6 +18,14 @@ variable "period_up" {
   default = "60"  
 }
 
+variable "threshold_up" {
+  default = "75"
+}
+
+variable "threshold_down" {
+  default = "25"
+}
+
 variable "statistic" {
   default = "Average"  
 }
@@ -36,6 +44,14 @@ variable "lowerbound" {
 
 variable "upperbound" {
   default = "0"  
+}
+
+variable "scale_up_scaling_adjustment" {
+  default = "1"
+}
+
+variable "scale_down_scaling_adjustment" {
+  default = "-1"
 }
 
 variable "ecs_autoscale_group_name" {

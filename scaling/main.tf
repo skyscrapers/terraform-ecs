@@ -6,7 +6,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cluster_scale_up_alarm" {
   namespace           = "AWS/ECS"
   period              = "${var.period_up}"
   statistic           = "${var.statistic}"
-  threshold           = "75"
+  threshold           = "${var.threshold_up}"
   dimensions {
     ClusterName = "${var.cluster_name}"
   }
@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cluster_scale_down_alarm" {
   namespace           = "AWS/ECS"
   period              = "${var.period_down}"
   statistic           = "${var.statistic}"
-  threshold           = "25"
+  threshold           = "${var.threshold_down}"
   dimensions {
     ClusterName = "${var.cluster_name}"
   }
@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_up_alarm" {
   namespace           = "AWS/ECS"
   period              = "${var.period_down}"
   statistic           = "${var.statistic}"
-  threshold           = "75"
+  threshold           = "${var.threshold_up}"
   dimensions {
     ClusterName = "${var.cluster_name}"
     ServiceName = "${var.service_name}"
@@ -73,7 +73,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_down_alarm" {
   namespace           = "AWS/ECS"
   period              = "${var.period_down}"
   statistic           = "${var.statistic}"
-  threshold           = "25"
+  threshold           = "${var.threshold_down}"
   dimensions {
     ClusterName = "${var.cluster_name}"
     ServiceName = "${var.service_name}"
@@ -102,7 +102,7 @@ resource "aws_appautoscaling_policy" "scale_down" {
 
   step_adjustment {
     metric_interval_upper_bound = "${var.lowerbound}"
-    scaling_adjustment          = "-1"
+    scaling_adjustment          = "${var.scale_down_scaling_adjustment}"
   }
 
   depends_on = ["aws_appautoscaling_target.ecs_target"]
@@ -119,7 +119,7 @@ resource "aws_appautoscaling_policy" "scale_up" {
 
   step_adjustment {
     metric_interval_upper_bound = "${var.upperbound}"
-    scaling_adjustment          = "1"
+    scaling_adjustment          = "${var.scale_up_scaling_adjustment}"
   }
 
   depends_on = ["aws_appautoscaling_target.ecs_target"]
