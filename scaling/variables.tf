@@ -23,28 +23,12 @@ variable "statistic" {
   default = "Average"  
 }
 
-variable "threshold_down" {
-  default = "20"
-}
-
-variable "threshold_up" {
-  default = "80"  
-}
-
 variable "min_capacity" {
   default = "1"
 }
 
 variable "max_capacity" {
   default = "4"  
-}
-
-variable "scaling_adjustment_down" {
-  default = "-1"  
-}
-
-variable "scaling_adjustment_up" {
-  default = "1"  
 }
 
 variable "lowerbound" {
@@ -55,6 +39,6 @@ variable "upperbound" {
   default = "0"  
 }
 
-variable "ecs_iam_role" {
-    
+variable "ecs_autoscale_group_name" {
+
 }
