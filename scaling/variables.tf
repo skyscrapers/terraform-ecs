@@ -7,7 +7,6 @@ variable "service_name" {
 }
 
 variable "evaluation_periods" {
-  description = "Name of the service"
   default     = "4"
 }
 

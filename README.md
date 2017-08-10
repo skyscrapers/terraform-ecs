@@ -28,7 +28,7 @@ Setup a ECS cluster and service scaling.
 
 ### Available variables:
  * [`cluster_name`]: String(required): The name of the ECS cluster.
- * [`service_name`]: String(required): The name of the ECS cluster.
+ * [`service_name`]: String(required): The name of the ECS service.
  * [`ecs_autoscale_group_name`]: String(required): The name of the autoscaling group on which scaling needs to be applied.
  * [`evaluation_periods`]: String(optional): Evaluation period for the cloudwatch alarms (default: 4)
  * [`period_down`]: String(optional): How long the threshold needs to be reached before a downscale happens. (default: 120)
