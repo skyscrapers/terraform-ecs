@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_up_alarm" {
-  alarm_name          = "${terraform.env}-${var.cluster_name}-ECSServiceScaleUpAlarm"
+  alarm_name          = "${terraform.env}-${var.cluster_name}-${var.service_name}-ECSServiceScaleUpAlarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "${var.evaluation_periods}"
   metric_name         = "CPUUtilization"
@@ -16,7 +16,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_up_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_down_alarm" {
-  alarm_name          = "${terraform.env}-${var.cluster_name}-ECSServiceScaleDownAlarm"
+  alarm_name          = "${terraform.env}-${var.cluster_name}-${var.service_name}-ECSServiceScaleDownAlarm"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "${var.evaluation_periods}"
   metric_name         = "CPUUtilization"
@@ -45,7 +45,7 @@ resource "aws_appautoscaling_policy" "scale_down" {
   adjustment_type         = "ChangeInCapacity"
   cooldown                = 60
   metric_aggregation_type = "Maximum"
-  name                    = "${terraform.env}-${var.cluster_name}-service-scale-down"
+  name                    = "${terraform.env}-${var.cluster_name}-${var.service_name}-scale-down"
   resource_id             = "service/${var.cluster_name}/${var.service_name}"
   scalable_dimension      = "ecs:service:DesiredCount"
   service_namespace       = "ecs"
@@ -62,7 +62,7 @@ resource "aws_appautoscaling_policy" "scale_up" {
   adjustment_type         = "ChangeInCapacity"
   cooldown                = 60
   metric_aggregation_type = "Maximum"
-  name                    = "${terraform.env}-${var.cluster_name}-service-scale-up"
+  name                    = "${terraform.env}-${var.cluster_name}-${var.service_name}-scale-up"
   resource_id             = "service/${var.cluster_name}/${var.service_name}"
   scalable_dimension      = "ecs:service:DesiredCount"
   service_namespace       = "ecs"
