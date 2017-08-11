@@ -53,7 +53,3 @@ variable "scale_up_scaling_adjustment" {
 variable "scale_down_scaling_adjustment" {
   default = "-1"
 }
-
-variable "ecs_autoscale_group_name" {
-
-}
