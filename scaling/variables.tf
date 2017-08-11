@@ -46,10 +46,10 @@ variable "upperbound" {
   default = "0"  
 }
 
-variable "scale_up_scaling_adjustment" {
+variable "scale_up_adjustment" {
   default = "1"
 }
 
-variable "scale_down_scaling_adjustment" {
+variable "scale_down_adjustment" {
   default = "-1"
 }

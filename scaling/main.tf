@@ -52,7 +52,7 @@ resource "aws_appautoscaling_policy" "scale_down" {
 
   step_adjustment {
     metric_interval_upper_bound = "${var.lowerbound}"
-    scaling_adjustment          = "${var.scale_down_scaling_adjustment}"
+    scaling_adjustment          = "${var.scale_down_adjustment}"
   }
 
   depends_on = ["aws_appautoscaling_target.ecs_target"]
@@ -69,7 +69,7 @@ resource "aws_appautoscaling_policy" "scale_up" {
 
   step_adjustment {
     metric_interval_upper_bound = "${var.upperbound}"
-    scaling_adjustment          = "${var.scale_up_scaling_adjustment}"
+    scaling_adjustment          = "${var.scale_up_adjustment}"
   }
 
   depends_on = ["aws_appautoscaling_target.ecs_target"]
