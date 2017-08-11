@@ -22,3 +22,34 @@ module "ecs_cluster" {
   environment = "${terraform.env}"
 }
 ```
+
+## scaling
+Setup a ECS cluster and service scaling.
+
+### Available variables:
+ * [`cluster_name`]: String(required): The name of the ECS cluster.
+ * [`service_name`]: String(required): The name of the ECS service.
+ * [`evaluation_periods`]: String(optional): Evaluation period for the cloudwatch alarms (default: 4)
+ * [`threshold_down`]: String(optional): Threshold when scaling down needs to happen. (default: 25)
+ * [`threshold_up`]: String(optional): Threshold when scaling up needs to happen. (default: 75)
+ * [`scale_up_adjustment`]: String(optional): Amount of tasks per check (maximum) that will be added. (default: 1)
+ * [`scale_down_adjustment`]: String(optional): Amount of tasks per check (maximum) that will be removed. (default: -1)
+ * [`period_down`]: String(optional): How long the threshold needs to be reached before a downscale happens. (default: 120)
+ * [`period_up`]: String(optional): How long the threshold needs to be reached before a upscale happens. (default: 60)
+ * [`statistic`]: String(optional): On what statistic the scaling needs to be based upon. (default: Average)
+ * [`min_capacity`]: String(optional): Minimum amount of ECS task to run for a service. (default: 1)
+ * [`max_capacity`]: String(optional): Maximum amount of ECS task to run for a service. (default: 4)
+
+### Output
+
+### Example
+```
+module "service-scaling" {
+  source                   = "scaling"
+  cluster_name             = "ecs-production"
+  service_name             = "test-service"
+  min_capacity             = "2"
+  max_capacity             = "10"
+  ecs_autoscale_group_name = "asg-production"
+}
+```
