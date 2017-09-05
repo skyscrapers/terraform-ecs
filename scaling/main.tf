@@ -51,7 +51,7 @@ resource "aws_appautoscaling_policy" "scale_down" {
   service_namespace       = "ecs"
 
   step_adjustment {
-    metric_interval_upper_bound = "${var.lowerbound}"
+    metric_interval_upper_bound = "${var.upperbound}"
     scaling_adjustment          = "${var.scale_down_adjustment}"
   }
 
@@ -68,7 +68,7 @@ resource "aws_appautoscaling_policy" "scale_up" {
   service_namespace       = "ecs"
 
   step_adjustment {
-    metric_interval_upper_bound = "${var.upperbound}"
+    metric_interval_lower_bound = "${var.lowerbound}"
     scaling_adjustment          = "${var.scale_up_adjustment}"
   }
 
