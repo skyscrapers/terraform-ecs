@@ -7,7 +7,7 @@ variable "service_name" {
 }
 
 variable "evaluation_periods" {
-  default     = "4"
+  default = "4"
 }
 
 variable "period_down" {
@@ -15,7 +15,7 @@ variable "period_down" {
 }
 
 variable "period_up" {
-  default = "60"  
+  default = "60"
 }
 
 variable "threshold_up" {
@@ -27,7 +27,7 @@ variable "threshold_down" {
 }
 
 variable "statistic" {
-  default = "Average"  
+  default = "Average"
 }
 
 variable "min_capacity" {
@@ -35,15 +35,15 @@ variable "min_capacity" {
 }
 
 variable "max_capacity" {
-  default = "4"  
+  default = "4"
 }
 
 variable "lowerbound" {
-  default = "0"  
+  default = "0"
 }
 
 variable "upperbound" {
-  default = "0"  
+  default = "0"
 }
 
 variable "scale_up_adjustment" {
