@@ -53,3 +53,43 @@ module "service-scaling" {
   ecs_autoscale_group_name = "asg-production"
 }
 ```
+
+## ecs-service
+Setup an ecs service without elb
+### Available variables:
+ * [`ecs_cluster`]: String(required): The name of the ECS cluster.
+ * [`service_name`]: String(required): The name of the ECS service.
+ * [`template_data`]: String(required): The rendered template file data definition 
+### Example:
+```
+module "ecs_service" {
+  source              = "https://github.com/skyscrapers/terraform-ecs//ecs-service"
+  service_name        = "${var.service_name}"
+  template_data       = "${data.template_file.task.rendered}"
+  ecs_cluster         = "${data.terraform_remote_state.ecs.ecs_cluster}"
+}
+```
+
+## ecs-service
+Setup an ecs service with elb, only ssl no s3 logs type
+### Available variables:
+ * [`ecs_cluster`]: String(required): The name of the ECS cluster.
+ * [`cluster_subnet`]: String(required): The subnet ID of the cluster VPC
+ * [`cluster_sg`]: String(required): The security groups of the cluster
+ * [`service_name`]: String(required): The name of the ECS service.
+ * [`template_data`]: String(required): The rendered template file data definition
+ * [`container_port`]: String(required): The port number to connect to from the ELB
+ * [`ssl_certificate_id`]: String(required): The arn of the ssl certficate to use for the ELB
+ * [`health_target`]: String(required): The target of the check. Valid pattern is ${PROTOCOL}:${PORT}${PATH}
+ * [`domain`]: String(required): The domain name to host the service. URL will be ${var.service_name}.${var.domain} 
+
+### Example:
+```
+module "ecs_service" {
+  source              = "https://github.com/skyscrapers/terraform-ecs//ecs-service_with_elb"
+  service_name        = "${var.service_name}"
+  template_data       = "${data.template_file.task.rendered}"
+  ecs_cluster         = "${data.terraform_remote_state.ecs.ecs_cluster}"
+  
+}
+```
