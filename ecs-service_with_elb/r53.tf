@@ -3,13 +3,14 @@ resource "aws_route53_zone" "zone" {
 }
 
 resource "aws_route53_record" "service_record" {
-  zone_id = ${aws_route53_zone.zone.zone_id}
-  name    = "${service_name}"
+  zone_id = "${aws_route53_zone.zone.zone_id}"
+  name    = "${var.service_name}"
   type    = "A"
 
   alias {
-    name                   = "${module.elb.dns_name}"
-    zone_id                = "${module.elb.zone_id}"
+    name                   = "${module.elb.elb_dns_name}"
+    zone_id                = "${module.elb.elb_zone_id}"
+    evaluate_target_health = "${var.evaluate_target_health}"
   }
 }
 
