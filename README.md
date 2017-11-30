@@ -59,10 +59,10 @@ Setup an ecs service without elb
 ### Available variables:
  * [`ecs_cluster`]: String(required): The name of the ECS cluster.
  * [`service_name`]: String(required): The name of the ECS service.
- * [`template_data`]: String(required): The rendered template file data definition 
+ * [`template_data`]: String(required): The rendered template file data definition
 ### Example:
 ```
-module "ecs_service" {
+module "new_service" {
   source              = "https://github.com/skyscrapers/terraform-ecs//ecs-service"
   service_name        = "${var.service_name}"
   template_data       = "${data.template_file.task.rendered}"
@@ -81,15 +81,24 @@ Setup an ecs service with elb, only ssl no s3 logs type
  * [`container_port`]: String(required): The port number to connect to from the ELB
  * [`ssl_certificate_id`]: String(required): The arn of the ssl certficate to use for the ELB
  * [`health_target`]: String(required): The target of the check. Valid pattern is ${PROTOCOL}:${PORT}${PATH}
- * [`domain`]: String(required): The domain name to host the service. URL will be ${var.service_name}.${var.domain} 
-
+ * [`domain_name`]: String(required): The domain name to host the service. URL will be ${var.service_name}.${var.domain}
+ * [`internal`]: Boolean(optional):default to false. If true, ELB will be an internal ELB.
+ * [`evaluate_target_health`]: Boolean(required): Enable/Disble evaluate target health for route53 alias record
 ### Example:
 ```
-module "ecs_service" {
-  source              = "https://github.com/skyscrapers/terraform-ecs//ecs-service_with_elb"
-  service_name        = "${var.service_name}"
-  template_data       = "${data.template_file.task.rendered}"
-  ecs_cluster         = "${data.terraform_remote_state.ecs.ecs_cluster}"
-  
+module "new_service" {
+  source                 = "github.com/skyscrapers/terraform-ecs//ecs-service_with_elb/"
+  service_name           = "${var.service_name}"
+  template_data          = "${data.template_file.task.rendered}"
+  ecs_cluster            = "${data.terraform_remote_state.ecs.ecs_cluster}"
+  cluster_sg             = "${data.terraform_remote_state.ecs.sg_ecs_instance_id}"
+  cluster_subnets        = "${data.terraform_remote_state.static.public_lb_subnets}"
+  domain_name            = "${var.domain_name}"
+  internal               = "false"
+  health_target          = "http:80/"
+  container_port         = "${var.container_port}"
+  ssl_certificate_id     = "{var.ssl_certificate_id}"
+  project                = "${var.project}"
+  evaluate_target_health = "${var.evaluate_target_health}"
 }
 ```
