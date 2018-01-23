@@ -39,6 +39,8 @@ Setup a ECS cluster and service scaling.
  * [`statistic`]: String(optional): On what statistic the scaling needs to be based upon. (default: Average)
  * [`min_capacity`]: String(optional): Minimum amount of ECS task to run for a service. (default: 1)
  * [`max_capacity`]: String(optional): Maximum amount of ECS task to run for a service. (default: 4)
+ * [`datapoints_to_alarm_up`]: String(optional): ) The number of datapoints that must be breaching to trigger the alarm to scale up (default: 4)
+ * [`datapoints_to_alarm_down`]: String(optional): The number of datapoints that must be breaching to trigger the alarm to scale down (default: 4)
 
 ### Output
 

@@ -53,3 +53,11 @@ variable "scale_up_adjustment" {
 variable "scale_down_adjustment" {
   default = "-1"
 }
+
+variable "datapoints_to_alarm_up" {
+  default = "4"
+}
+
+variable "datapoints_to_alarm_down" {
+  default = "4"
+}

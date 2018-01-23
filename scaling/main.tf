@@ -7,6 +7,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_up_alarm" {
   period              = "${var.period_down}"
   statistic           = "${var.statistic}"
   threshold           = "${var.threshold_up}"
+  datapoints_to_alarm = "${var.datapoints_to_alarm_up}"
 
   dimensions {
     ClusterName = "${var.cluster_name}"
@@ -26,6 +27,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_down_alarm" {
   period              = "${var.period_down}"
   statistic           = "${var.statistic}"
   threshold           = "${var.threshold_down}"
+  datapoints_to_alarm = "${var.datapoints_to_alarm_down}"
 
   dimensions {
     ClusterName = "${var.cluster_name}"
