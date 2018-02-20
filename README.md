@@ -34,6 +34,25 @@ Creates an Elastic Filesystem, mount points and cloud-config to mount at boot
   * [`name`]: String(optional): The name to tag EFS (default: efs)
   * [`security_groups`]: List(optional): The security groups to associate with the mount points (default: [] adds default security group)
 
+### Output
+  * [`cloud_config`]: The cloud config to mount efs at boot
+  * [`dns_name`]: The DNS name of the elastic file system
+  * [`efs_id`]: ID of the EFS
+  * [`kms_key_id`]: KMS key used to encrypt EFS
+  * [`mount_target_ids`]: List of mount target ids
+  * [`mount_target_interface_ids`]: List of mount target interface ids
+
+### Example
+```
+module "efs" {
+  source          = "efs"
+  project         = "myproject"
+  subnets         = "${module.vpc.private_db}"
+  subnet_amount   = 3
+  security_groups = ["sg-ac66e1d6"]
+}
+```
+
 ## scaling
 Setup a ECS cluster and service scaling.
 
