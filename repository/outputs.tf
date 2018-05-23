@@ -1,11 +1,11 @@
-output "repository-url" {
+output "repository_url" {
   value = "${aws_ecr_repository.ecr-repo.repository_url}"
 }
 
-output "repository-pull-policy" {
+output "repository_pull_policy" {
   value = "${aws_iam_policy.ecr-repo-pull.id}"
 }
 
-output "repository-push-policy" {
+output "repository_push_policy" {
   value = "${aws_iam_policy.ecr-repo-push.id}"
 }
