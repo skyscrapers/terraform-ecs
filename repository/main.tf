@@ -3,6 +3,7 @@ resource "aws_ecr_repository" "ecr-repo" {
 }
 
 resource "aws_ecr_lifecycle_policy" "ecr-repo-policy" {
+  count      = "${(var.expire_after == 0)? 0 : 1}"
   repository = "${aws_ecr_repository.ecr-repo.name}"
 
   policy = <<EOF
