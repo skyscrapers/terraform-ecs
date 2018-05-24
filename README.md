@@ -23,6 +23,29 @@ module "ecs_cluster" {
 }
 ```
 
+## Repository
+Creates an Elastic Container Registry with associated pull & push policies.
+The created pull & push policies can be used as policy attachments on AWS roles.
+
+### Available variables:
+  * [`repository_name`]: String(required): The name of the ECR repository
+  * [`expire_after`]: Integer(optional): The amount of days after which untagged images expire. Set to 0 if you do not want a lifecycle policy. (default: 30)
+
+### Output
+  * [`repository_url`]: The url to the ECR repository
+  * [`repository_push_policy`]: The id of the push policy to this ECR repository.
+  * [`repository_pull_policy`]: The id of the pull policy to this ECR repository.
+
+### Example
+```
+module "jenkins-repo" {
+  source                 = "github.com/skyscrapers/terraform-ecs//repository"
+  repository_name        = "jenkins"
+  repository_description = "Jenkins Master"
+  expire_after           = 14
+}
+```
+
 ## EFS
 Creates an Elastic Filesystem, mount points and cloud-config to mount at boot
 
