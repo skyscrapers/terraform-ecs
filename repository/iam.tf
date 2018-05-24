@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "ecr-repo-push" {
 resource "aws_iam_policy" "ecr-repo-push" {
   name        = "ecr-${var.repository_name}-push"
   path        = "/"
-  description = "Push access to the ${var.repository_description} repository"
+  description = "Push access to the ${var.repository_name} repository"
 
   policy = "${data.aws_iam_policy_document.ecr-repo-push.json}"
 }
@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "ecr-repo-pull" {
 resource "aws_iam_policy" "ecr-repo-pull" {
   name        = "ecr-${var.repository_name}-pull"
   path        = "/"
-  description = "Pull access to the ${var.repository_description} repository"
+  description = "Pull access to the ${var.repository_name} repository"
 
   policy = "${data.aws_iam_policy_document.ecr-repo-pull.json}"
 }
