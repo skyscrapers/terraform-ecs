@@ -92,10 +92,11 @@ def main(argv):
         timeout = 30
         ecs_info = getECSInfo(ecs_cluster)
         while len(ecs_info['containerInstanceArns']) != desiredInstanceCount:
-            print("Current active cluster nodes: "+str(len(ecs_info['containerInstanceArns'])))
+            print("Current active cluster nodes: %s desired: %s" % (str(len(ecs_info['containerInstanceArns'])),desiredInstanceCount))
             if timeout > maxTimeout:
                 print('Rolling back, reached timeout while registering instances to ECS cluster')
                 rollbackAutoscaling(info, active, ami, command, projectPath, environment)
+                print('Rollback complete: unable to get the desired amount of nodes registered to the ECS cluster')
                 sys.exit(2)
 
             print('Waiting for 10 seconds to get ecs status')
