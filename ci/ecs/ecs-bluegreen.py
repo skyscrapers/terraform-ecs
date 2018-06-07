@@ -146,11 +146,10 @@ def describeECSInstance(container_instance_ids,ecs_cluster):
     )
     return response
 
-def getECSInfo(ecs_cluster,status='ACTIVE'):
+def getECSInfo(ecs_cluster):
     client = boto3.client('ecs')
     response = client.list_container_instances(
-        cluster=ecs_cluster,
-        status=status
+        cluster=ecs_cluster
     )
     return response
 
