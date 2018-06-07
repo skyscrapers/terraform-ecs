@@ -16,7 +16,7 @@ params:
 
 inputs:
 - name: terraform-repo
-- name: terraform-bluegreen
+- name: terraform-ecs
 - name: ami
   optional: true
 
@@ -34,7 +34,7 @@ run:
     export PATH=$PATH:$PWD
 
     # Install dependencies of the deployment script
-    pip install -r terraform-bluegreen/ci/ecs/requirements.txt
+    pip install -r terraform-ecs/ci/ecs/requirements.txt
 
 
     # Assume Role in the destination AWS account
@@ -54,4 +54,4 @@ run:
     terraform init
     terraform workspace select $TF_ENVIRONMENT
     # Deploy
-    $WORKDIR/terraform-bluegreen/ci/ecs/ecs-bluegreen.py -f $WORKDIR/terraform-repo/$TF_PROJECT_FOLDER -a $AMI_ID -c "apply -auto-approve" -t 500 -e $WORKDIR/terraform-repo/$TF_PROJECT_FOLDER/$TF_ENVIRONMENT.tfvars
+    $WORKDIR/terraform-ecs/ci/ecs/ecs-bluegreen.py -f $WORKDIR/terraform-repo/$TF_PROJECT_FOLDER -a $AMI_ID -c "apply -auto-approve" -t 500 -e $WORKDIR/terraform-repo/$TF_PROJECT_FOLDER/$TF_ENVIRONMENT.tfvars
