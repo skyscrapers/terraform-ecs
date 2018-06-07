@@ -1,0 +1,57 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: "python"
+    tag: "2.7.13-alpine"
+
+params:
+  TF_PROJECT_FOLDER:
+  TF_VERSION: "0.11.7"
+  AWS_DEFAULT_REGION: eu-west-1
+  ROLE_TO_ASSUME: ops/terraform
+  TF_ENVIRONMENT:
+  AWS_ACCOUNT_ID:
+
+inputs:
+- name: terraform-repo
+- name: terraform-bluegreen
+- name: ami
+  optional: true
+
+run:
+  path: sh
+  args:
+  - -exc
+  - |
+    # Install dependencies
+    apk add --update unzip curl jq git
+
+    # Install terraform
+    curl -s -o "terraform.zip" "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+    unzip terraform.zip
+    export PATH=$PATH:$PWD
+
+    # Install dependencies of the deployment script
+    pip install -r terraform-bluegreen/ci/ecs/requirements.txt
+
+
+    # Assume Role in the destination AWS account
+    ASSUMED_ROLE=$(aws sts assume-role --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/${ROLE_TO_ASSUME} --role-session-name concourse-ecs-update)
+    export AWS_ACCESS_KEY_ID=$(echo "$ASSUMED_ROLE" | jq -r ".Credentials.AccessKeyId")
+    export AWS_SECRET_ACCESS_KEY=$(echo "$ASSUMED_ROLE" | jq -r ".Credentials.SecretAccessKey")
+    export AWS_SESSION_TOKEN=$(echo "$ASSUMED_ROLE" | jq -r ".Credentials.SessionToken")
+
+    # Extract AMI id from packer manifest
+    if [ -d "ami" ]; then
+      AMI_ID=$(cat ami/id)
+    fi
+
+    WORKDIR=$PWD
+    cd terraform-repo/$TF_PROJECT_FOLDER
+    # Init terraform
+    terraform init
+    terraform workspace select $TF_ENVIRONMENT
+    # Deploy
+    $WORKDIR/terraform-bluegreen/ci/ecs/ecs-bluegreen.py -f $WORKDIR/terraform-repo/$TF_PROJECT_FOLDER -a $AMI_ID -c "apply -auto-approve" -t 500 -e $WORKDIR/terraform-repo/$TF_PROJECT_FOLDER/$TF_ENVIRONMENT.tfvars
