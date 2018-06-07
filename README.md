@@ -109,7 +109,7 @@ module "service-scaling" {
 }
 ```
 
-## CI/CD LaunchConfigurationName
+## CI/CD 
 
 In the `ci` folder you can find some tasks definition for automating deployment with `concourse`
 
