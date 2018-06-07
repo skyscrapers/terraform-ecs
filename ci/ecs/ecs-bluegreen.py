@@ -92,7 +92,7 @@ def main(argv):
         timeout = 30
         ecs_info = getECSInfo(ecs_cluster)
         while len(ecs_info['containerInstanceArns']) != desiredInstanceCount:
-            print("Current active cluster nodes: %s desired: %s" % (str(len(ecs_info['containerInstanceArns'])),desiredInstanceCount))
+            print("Current active cluster nodes: %s desired: %s" % (str(len(ecs_info['containerInstanceArns'])),str(desiredInstanceCount)))
             if timeout > maxTimeout:
                 print('Rolling back, reached timeout while registering instances to ECS cluster')
                 rollbackAutoscaling(info, active, ami, command, projectPath, environment)
@@ -127,7 +127,7 @@ def removeInstancesFromECS(old_asg,ecs_cluster,ecs_info,forceRecycle,maxTimeout=
                     break
                 else:
                     sys.exit(2)
-            print("still active number of tasks: " + instance_details['containerInstances'][0]['runningTasksCount'])
+            print("still active number of tasks: " + str(instance_details['containerInstances'][0]['runningTasksCount']))
             time.sleep(10)
             instance_details = describeECSInstance([instance],ecs_cluster)
             timeout += 10
