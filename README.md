@@ -108,3 +108,27 @@ module "service-scaling" {
   ecs_autoscale_group_name = "asg-production"
 }
 ```
+
+## CI/CD LaunchConfigurationName
+
+In the `ci` folder you can find some tasks definition for automating deployment with `concourse`
+
+### ECS
+This folder contians a script that can be used to automatically update the ecs AMI.
+It also contains a concourse task definition that allows to use the script in a concourse pipeline.
+
+In order to add this task in a pipeline you need to specify the following inputs:
+ * [`terraform-ecs`] : This git repo
+ * [`terraform-repo`] : The git repo with the terraform code that contains the ecs cluster
+ * [`ami`] : The ami resource that we want to deploy
+
+ You can customize your pipeline with the following params:
+ * [`TF_PROJECT_FOLDER`] : The folder that contains the ecs cluster definition
+ * [`TF_VERSION`] : The terraform version of the project
+ * [`AWS_DEFAULT_REGION`] : The AWS region where the ecs cluster has been deployed
+ * [`ROLE_TO_ASSUME`] : The role to assume in order to run terraform
+ * [`TIMEOUT`] : The time the script will wait for the container to migrate to the new instances
+ * [`TF_ENVIRONMENT`] : The terraform workspace to target
+ * [`AWS_ACCOUNT_ID`] : The account_id where the infra has been deployed
+
+An example of a concourse pipeline can be found in the [example pipeline](ci/ecs/sample.yml)
