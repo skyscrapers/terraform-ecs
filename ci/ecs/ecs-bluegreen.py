@@ -126,6 +126,7 @@ def removeInstancesFromECS(old_asg,ecs_cluster,ecs_info,forceRecycle,maxTimeout=
                     print("Force recycling of instance: "+instance)
                     break
                 else:
+                    print("Unable to cleanup instance %s in %s seconds " % (instance,str(timeout)))
                     sys.exit(2)
             print("still active number of tasks: " + str(instance_details['containerInstances'][0]['runningTasksCount']))
             time.sleep(10)
