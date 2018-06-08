@@ -1,0 +1,51 @@
+---
+resource_types:
+- name: ami
+  type: docker-image
+  source:
+    repository: jdub/ami-resource
+
+- name: git-skyscrapers
+  type: git
+  source:
+    uri: git@github.com:skyscrapers/xxxxx.git
+    branch: master
+    private_key: ((PRIVATE_KEY))
+- name: git-terraform-ecs
+  type: git
+  source:
+    uri: git@github.com:skyscrapers/terraform-ecs.git
+    branch: ecs-automation
+    private_key: ((PRIVATE_KEY))
+- name: ecs-ami
+  type: ami
+  check_every: 1h
+  source:
+    aws_access_key_id: ((AWS_CONCOURSE.key))
+    aws_secret_access_key: ((AWS_CONCOURSE.secret))
+    region: eu-west-1
+    filters:
+      owner-id: "591542846629"
+      is-public: true
+      state: available
+      name: amzn-ami-*.a-amazon-ecs-optimized
+jobs:
+- name: update-ecs
+  plan:
+    - do:
+      - aggregate:
+        - get: git-skyscrapers
+        - get: ecs-ami
+        - get: git-terraform-ecs
+      - task: deploy
+        file: git-terraform-ecs/ci/ecs/update-ecs.yml
+        input_mapping:
+          ami: ecs-ami
+          terraform-ecs: git-terraform-ecs
+          terraform-repo: git-skyscrapers
+        params:
+          TF_PROJECT_FOLDER: stacks/ecs-cluster
+          TF_ENVIRONMENT: production
+          TF_VERSION: 0.11.7
+          AWS_ACCOUNT_ID: ((ACCOUNT_ID))
+          TIMEOUT: 900
