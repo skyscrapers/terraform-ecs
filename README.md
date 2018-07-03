@@ -11,6 +11,7 @@ Setup a basic ECS cluster with the needed IAM rights.
  * [`cluster_name`]: String: The name of the ECS cluster.
  * [`cluster_id`]: String: The ID (ARN) of the ECS cluster.
  * [`ecs-instance-profile`]: IAM instance profile that you need to give to your instances.
+ * [`ecs_instance_profile_arn`]: IAM instance profile arn that you need to give to your instances.
  * [`ecs-service-role`]: IAM service role for ECS to manage your loadbalancers
  * [`ecs-instance-role`]: IAM instance role name, useful to attach extra policies
 
@@ -109,7 +110,7 @@ module "service-scaling" {
 }
 ```
 
-## CI/CD 
+## CI/CD
 
 In the `ci` folder you can find some tasks definition for automating deployment with `concourse`
 
