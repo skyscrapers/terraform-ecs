@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs-autoscale-role" {
-  name = "ecs-scale-${terraform.env}-${var.cluster_name}-${var.service_name}"
+  name = "ecs-scale-${var.cluster_name}-${var.service_name}"
 
   assume_role_policy = <<EOF
 {
