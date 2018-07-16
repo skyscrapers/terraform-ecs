@@ -96,6 +96,7 @@ Setup a ECS cluster and service scaling.
  * [`datapoints_to_alarm_up`]: String(optional): ) The number of datapoints that must be breaching to trigger the alarm to scale up (default: 4)
  * [`datapoints_to_alarm_down`]: String(optional): The number of datapoints that must be breaching to trigger the alarm to scale down (default: 4)
 
+
 ### Output
 
 ### Example
@@ -107,6 +108,32 @@ module "service-scaling" {
   min_capacity             = "2"
   max_capacity             = "10"
   ecs_autoscale_group_name = "asg-production"
+}
+```
+
+## user-data
+Setup a ECS cluster and service user-data.
+
+### Available variables:
+ * [`project`]: String(optional): The project to tag EFS (default: "")
+ * [`environment`]: String(required):  For what environment is this cluster needed (eg staging, production, ...)
+ * [`cluster_name`]: String(required): The name of the ECS cluster.
+ * [`teleport_version`]: String(optional): The version of Teleport to be used (default: 2.5.8).
+ * [`teleport_server`]: String(optional): the name of the teleport server to connect to(default: "")
+ * [`teleport_auth_token`]: String(optional): Teleport server node token (default: "")
+
+### Output
+
+### Example
+```
+module "service-user-data" {
+  source                   = "user-data"
+  project             = "${var.project}"
+  environment         = "${terraform.workspace}"
+  teleport_auth_token = "${data.aws_kms_secret.secret.auth_token}"
+  teleport_version    = "${var.teleport_version}"
+  teleport_server     = "${var.teleport_server}"
+  cluster_name        = "${module.ecs_cluster.cluster_name}"
 }
 ```
 
