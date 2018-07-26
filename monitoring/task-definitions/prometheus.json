@@ -14,31 +14,49 @@
             "protocol": "tcp"
           }
         ],
+        "links": [
+          "alertmanager"
+        ],
         "hostname": null,
         "essential": true,
         "entryPoint": null,
         "mountPoints": [
           {
-            "containerPath": "/etc/prometheus",
+            "containerPath": "/prometheus",
             "sourceVolume": "prometheus",
             "readOnly": null
           }
         ],
         "name": "prometheus",
-        "ulimits": null,
-        "dockerSecurityOptions": null,
-        "environment": [],
-        "links": null,
-        "workingDirectory": null,
-        "readonlyRootFilesystem": null,
         "image": "prom/prometheus:latest",
         "command": [
-          "--config.file=/etc/prometheus/prometheus.yml"
+          "--config.file=/prometheus/prometheus.yml",
+          "--storage.tsdb.path=/prometheus/data/"
+
         ],
-        "user": null,
-        "dockerLabels": null,
+        "cpu": 0
+      },
+      {
+        "name": "alertmanager",
+        "image": "prom/alertmanager:latest",
+        "command": [
+          "--config.file=/prometheus/alertmanager.yml"
+        ],
+        "mountPoints": [
+          {
+            "containerPath": "/prometheus",
+            "sourceVolume": "prometheus",
+            "readOnly": null
+          }
+        ],
+        "essential": true,
         "cpu": 0,
-        "privileged": null,
-        "memoryReservation": null
+        "memory": 150,
+        "portMappings": [
+          {
+            "hostPort": 0,
+            "containerPort": 9093
+          }
+        ]
       }
 ]

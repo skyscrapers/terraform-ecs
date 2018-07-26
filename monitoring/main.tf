@@ -4,12 +4,12 @@ data "aws_route53_zone" "root" {
 #TODO: improve container configuration
 resource "aws_ecs_task_definition" "prometheus" {
   family                = "prometheus-${var.environment}"
-  network_mode          = "host"
+  network_mode          = "bridge"
   container_definitions = "${file("${path.module}/task-definitions/prometheus.json")}"
   task_role_arn         = "${aws_iam_role.prometheus.arn}"
   volume {
     name      = "prometheus"
-    host_path = "/etc/prometheus"
+    host_path = "/prometheus"
   }
   placement_constraints {
   type       = "memberOf"
@@ -78,6 +78,6 @@ resource "aws_route53_record" "prometheus" {
   zone_id = "${data.aws_route53_zone.root.zone_id}"
   name    = "prometheus.${var.r53_zone}"
   type    = "CNAME"
-  records = ["${var.alb_dns_name}"] 
+  records = ["${var.alb_dns_name}"]
   ttl     = "60"
 }

@@ -15,7 +15,7 @@ variable "teleport_auth_token" {
 }
 
 variable "efs_mount_point" {
-  default = "/etc/prometheus"
+  default = "/prometheus"
 }
 variable "efs_id" {
   default = ""
