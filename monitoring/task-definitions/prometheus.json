@@ -1,0 +1,44 @@
+[
+      {
+        "volumesFrom": [],
+        "memory": 300,
+        "extraHosts": null,
+        "linuxParameters": null,
+        "dnsServers": null,
+        "disableNetworking": null,
+        "dnsSearchDomains": null,
+        "portMappings": [
+          {
+            "hostPort": 9090,
+            "containerPort": 9090,
+            "protocol": "tcp"
+          }
+        ],
+        "hostname": null,
+        "essential": true,
+        "entryPoint": null,
+        "mountPoints": [
+          {
+            "containerPath": "/etc/prometheus",
+            "sourceVolume": "prometheus",
+            "readOnly": null
+          }
+        ],
+        "name": "prometheus",
+        "ulimits": null,
+        "dockerSecurityOptions": null,
+        "environment": [],
+        "links": null,
+        "workingDirectory": null,
+        "readonlyRootFilesystem": null,
+        "image": "prom/prometheus:latest",
+        "command": [
+          "--config.file=/etc/prometheus/prometheus.yml"
+        ],
+        "user": null,
+        "dockerLabels": null,
+        "cpu": 0,
+        "privileged": null,
+        "memoryReservation": null
+      }
+]

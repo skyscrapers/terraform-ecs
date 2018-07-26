@@ -1,0 +1,36 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: golang
+    tag: '1.9-alpine'
+
+params:
+  AWS_DEFAULT_REGION: 'eu-west-1'
+  TEST_R53_ZONE_NAME: ''
+  TEST_ACM_ARN: ''
+  TEST_LE_EMAIL: 'something@example.com'
+  TF_VERSION: '0.11.7'
+
+inputs:
+- name: terraform-src
+  path: gopath/src/github.com/skyscrapers/terraform-vault
+
+run:
+  path: sh
+  args:
+    - -exc
+    - |
+      apk add --update unzip curl dep git
+
+      # Install terraform
+      curl -s -o "terraform.zip" "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+      unzip terraform.zip
+      export PATH=$PATH:$PWD
+
+      export GOPATH=$PWD/gopath
+
+      cd gopath/src/github.com/skyscrapers/terraform-ecs/test
+      dep ensure
+      go test -v -timeout 60m
