@@ -1,12 +1,10 @@
-data "aws_region" "current" {}
-
 data "template_file" "prometheus_service_cloudinit" {
   template = "${file("${path.module}/templates/prometheus.service.tpl")}"
 
   vars {
-    prometheus_service  = "${indent(4,file("${path.module}/templates/prometheus-upstart.conf"))}"
-    service_type_path = "/etc/init.d/prometheus"
-    file_permissions  = "0755"
+    prometheus_service = "${indent(4,file("${path.module}/templates/prometheus-upstart.conf"))}"
+    service_type_path  = "/etc/init.d/prometheus"
+    file_permissions   = "0755"
   }
 }
 
@@ -51,14 +49,14 @@ sudo ./teleport/install
 iptables --insert FORWARD 1 --in-interface docker+ --destination 169.254.169.254/32 --jump DROP
 service iptables save
 cd /opt
-curl -Lo "https://github.com/prometheus/node_exporter/releases/download/v${var.node_exporter_version}/node_exporter-${var.node_exporter_version}.linux-amd64.tar.gz"
+curl -LO "https://github.com/prometheus/node_exporter/releases/download/v${var.node_exporter_version}/node_exporter-${var.node_exporter_version}.linux-amd64.tar.gz"
 tar -xzf node_exporter-${var.node_exporter_version}.linux-amd64.tar.gz
 mv node_exporter-${var.node_exporter_version}.linux-amd64/node_exporter /usr/local/bin/
 chmod +x /usr/local/bin/node_exporter
 
 echo ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config
 start ecs
-
+service prometheus start
 EOF
   }
 
@@ -67,9 +65,11 @@ EOF
 
     content = "${module.teleport_bootstrap_script.teleport_bootstrap_script}"
   }
+
   part {
-  content_type = "text/cloud-config"
-    content      = <<EOF
+    content_type = "text/cloud-config"
+
+    content = <<EOF
 #cloud-config
 package_upgrade: true
 packages:

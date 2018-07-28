@@ -1,5 +1,5 @@
 resource "aws_iam_role_policy_attachment" "prometheus" {
-  role = "${aws_iam_role.prometheus.id}"
+  role       = "${aws_iam_role.prometheus.id}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
 }
 

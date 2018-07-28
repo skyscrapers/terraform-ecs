@@ -1,25 +1,42 @@
 data "aws_route53_zone" "root" {
   name = "${var.r53_zone}"
 }
-#TODO: improve container configuration
-resource "aws_ecs_task_definition" "prometheus" {
-  family                = "prometheus-${var.environment}"
+
+data "aws_region" "current" {}
+
+data "template_file" "monitoring" {
+  template = "${file("${path.module}/task-definitions/monitoring.json")}"
+
+  vars {
+    aws_region                      = "${data.aws_region.current.name}"
+    version_prometheus              = "${var.version_prometheus}"
+    cpu_prometheus                  = "${var.cpu_prometheus}"
+    memory_prometheus               = "${var.memory_prometheus}"
+    memory_reservation_prometheus   = "${var.memory_reservation_prometheus}"
+    cpu_alertmanager                = "${var.cpu_alertmanager}"
+    memory_alertmanager             = "${var.memory_alertmanager}"
+    memory_reservation_alertmanager = "${var.memory_reservation_alertmanager}"
+    version_alertmanager            = "${var.version_alertmanager}"
+    environment                     = "${var.environment}"
+  }
+}
+
+resource "aws_ecs_task_definition" "monitoring" {
+  family                = "monitoring-${var.environment}"
   network_mode          = "bridge"
-  container_definitions = "${file("${path.module}/task-definitions/prometheus.json")}"
+  container_definitions = "${data.template_file.monitoring.rendered}"
   task_role_arn         = "${aws_iam_role.prometheus.arn}"
+
   volume {
     name      = "prometheus"
     host_path = "/prometheus"
   }
-  placement_constraints {
-  type       = "memberOf"
-  expression = "attribute:type == prometheus"
 }
-}
+
 resource "aws_ecs_service" "prometheus" {
-  name            = "prometheus-${var.environment}"
+  name            = "monitoring"
   cluster         = "${var.cluster_name}"
-  task_definition = "${aws_ecs_task_definition.prometheus.arn}"
+  task_definition = "${aws_ecs_task_definition.monitoring.arn}"
   desired_count   = "${var.desired_count}"
   iam_role        = "${var.ecs_service_role}"
 
@@ -42,11 +59,11 @@ resource "aws_alb_target_group" "prometheus" {
   vpc_id   = "${var.vpc_id}"
 
   health_check {
-      interval = 30
-      path = "/graph"
-      timeout = 5
-      healthy_threshold = 5
-      unhealthy_threshold = 2
+    interval            = 30
+    path                = "/graph"
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
   }
 }
 
@@ -76,8 +93,17 @@ resource "aws_security_group_rule" "inbound" {
 
 resource "aws_route53_record" "prometheus" {
   zone_id = "${data.aws_route53_zone.root.zone_id}"
-  name    = "prometheus.${var.r53_zone}"
+  name    = "prometheus.${var.r53_zone_prefix}${var.r53_zone}"
   type    = "CNAME"
   records = ["${var.alb_dns_name}"]
   ttl     = "60"
+}
+
+resource "aws_cloudwatch_log_group" "cwlogs" {
+  name              = "monitoring-${var.environment}"
+  retention_in_days = "14"
+
+  tags {
+    Environment = "${var.environment}"
+  }
 }

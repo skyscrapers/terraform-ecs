@@ -1,0 +1,71 @@
+[
+      {
+        "name": "prometheus",
+        "image": "prom/prometheus:${version_prometheus}",
+        "essential": true,
+        "cpu": ${cpu_prometheus},
+        "memory": ${memory_prometheus},
+        "memoryReservation": ${memory_reservation_prometheus},
+        "portMappings": [
+          {
+            "hostPort": 9090,
+            "containerPort": 9090,
+            "protocol": "tcp"
+          }
+        ],
+        "links": [
+          "alertmanager"
+        ],
+        "mountPoints": [
+          {
+            "containerPath": "/prometheus",
+            "sourceVolume": "prometheus",
+            "readOnly": null
+          }
+        ],
+        "command": [
+          "--config.file=/prometheus/prometheus.yml",
+          "--storage.tsdb.path=/prometheus/data/"
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "monitoring-${environment}",
+            "awslogs-region": "${aws_region}",
+            "awslogs-stream-prefix": "prometheus"
+          }
+        }
+      },
+      {
+        "name": "alertmanager",
+        "image": "prom/alertmanager:${version_alertmanager}",
+        "essential": true,
+        "cpu": ${cpu_alertmanager},
+        "memory": ${memory_alertmanager},
+        "memoryReservation": ${memory_reservation_alertmanager},
+        "command": [
+          "--config.file=/prometheus/alertmanager.yml"
+        ],
+        "mountPoints": [
+          {
+            "containerPath": "/prometheus",
+            "sourceVolume": "prometheus",
+            "readOnly": null
+          }
+        ],
+        "portMappings": [
+          {
+            "hostPort": 0,
+            "containerPort": 9093
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "monitoring-${environment}",
+            "awslogs-region": "${aws_region}",
+            "awslogs-stream-prefix": "alertmanager"
+          }
+        }
+      }
+]
