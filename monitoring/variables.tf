@@ -63,6 +63,7 @@ variable "memory_reservation_alertmanager" {
 variable "version_prometheus" {
   default = "latest"
 }
+
 variable "version_alertmanager" {
   default = "latest"
 }
