@@ -9,7 +9,7 @@ variable "desired_count" {
 }
 
 variable "prometheus_port" {
-  default = "9100"
+  default = "9090"
 }
 
 variable "protocol" {
@@ -67,3 +67,9 @@ variable "version_prometheus" {
 variable "version_alertmanager" {
   default = "latest"
 }
+
+variable "alb_arn" {}
+
+variable "alb_sg_id" {}
+
+variable "alb_ssl_cert" {}

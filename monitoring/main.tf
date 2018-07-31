@@ -31,6 +31,11 @@ resource "aws_ecs_task_definition" "monitoring" {
     name      = "prometheus"
     host_path = "/prometheus"
   }
+
+  placement_constraints {
+    expression = "attribute:type == prometheus"
+    type       = "memberOf"
+  }
 }
 
 resource "aws_ecs_service" "prometheus" {
@@ -52,6 +57,25 @@ resource "aws_ecs_service" "prometheus" {
   }
 }
 
+module "alb_listener_prometheus" {
+  source                      = "github.com/skyscrapers/terraform-loadbalancers//alb_listener?ref=6.0.0"
+  environment                 = "${var.environment}"
+  project                     = "prometheus"
+  vpc_id                      = "${var.vpc_id}"
+  name_prefix                 = "https"
+  alb_arn                     = "${var.alb_arn}"
+  alb_sg_id                   = "${var.alb_sg_id}"
+  https_certificate_arn       = "${var.alb_ssl_cert}"
+  ingress_port                = "${var.prometheus_port}"
+  create_default_target_group = false
+  default_target_group_arn    = "${aws_alb_target_group.prometheus.arn}"
+  source_subnet_cidrs         = "${var.source_subnet_cidrs}"
+
+  tags = {
+    Role = "loadbalancer"
+  }
+}
+
 resource "aws_alb_target_group" "prometheus" {
   name     = "prometheus-${var.environment}"
   port     = "${var.prometheus_port}"
@@ -64,21 +88,6 @@ resource "aws_alb_target_group" "prometheus" {
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
-  }
-}
-
-resource "aws_alb_listener_rule" "prometheus" {
-  listener_arn = "${var.https_listener}"
-  priority     = "${var.priority}"
-
-  action {
-    type             = "forward"
-    target_group_arn = "${aws_alb_target_group.prometheus.arn}"
-  }
-
-  condition {
-    field  = "host-header"
-    values = ["prometheus.*"]
   }
 }
 

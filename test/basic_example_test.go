@@ -46,7 +46,7 @@ func TestBasicExample(t *testing.T) {
 
 	test_structure.RunTestStage(t, "deploy", func() {
 		uniqueId := random.UniqueId()
-		projectName := fmt.Sprintf("vault-%s", uniqueId)
+		projectName := fmt.Sprintf("ecs-%s", uniqueId)
 
 		terraformOptions := &terraform.Options{
 			TerraformDir: exampleFolder,
