@@ -31,11 +31,6 @@ resource "aws_ecs_task_definition" "monitoring" {
     name      = "prometheus"
     host_path = "/prometheus"
   }
-
-  placement_constraints {
-    expression = "attribute:type == prometheus"
-    type       = "memberOf"
-  }
 }
 
 resource "aws_ecs_service" "prometheus" {
