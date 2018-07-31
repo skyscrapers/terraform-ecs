@@ -61,11 +61,11 @@ variable "memory_reservation_alertmanager" {
 }
 
 variable "version_prometheus" {
-  default = "latest"
+  default = "v2.2.1"
 }
 
 variable "version_alertmanager" {
-  default = "latest"
+  default = "v0.15.1"
 }
 
 variable "alb_arn" {}
@@ -73,3 +73,7 @@ variable "alb_arn" {}
 variable "alb_sg_id" {}
 
 variable "alb_ssl_cert" {}
+
+variable "source_subnet_cidrs" {
+  type = "list"
+}
