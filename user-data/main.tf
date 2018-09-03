@@ -76,7 +76,7 @@ packages:
 - nfs-utils
 runcmd:
 - mkdir -p ${var.efs_mount_point}/data
-- echo "fs-15a0d8dc.efs.eu-west-1.amazonaws.com:/ ${var.efs_mount_point} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0" >> /etc/fstab
+- echo "${var.efs_dns_name}:/ ${var.efs_mount_point} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0" >> /etc/fstab
 - mount -a -t nfs4
 EOF
   }
