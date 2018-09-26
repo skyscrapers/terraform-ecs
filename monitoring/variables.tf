@@ -77,3 +77,23 @@ variable "alb_ssl_cert" {}
 variable "source_subnet_cidrs" {
   type = "list"
 }
+
+variable "cpu_grafana" {
+  default = "0"
+}
+
+variable "memory_grafana" {
+  default = "100"
+}
+
+variable "memory_reservation_grafana" {
+  default = "100"
+}
+
+variable "version_grafana" {
+  default = "latest"
+}
+
+variable "grafana_port" {
+  default = "3000"
+}
