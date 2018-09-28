@@ -67,5 +67,37 @@
             "awslogs-stream-prefix": "alertmanager"
           }
         }
+      },
+      {
+        "name": "cloudwatch_exporter",
+        "image": "prom/cloudwatch-exporter:${version_cloudwatch_exporter}",
+        "essential": true,
+        "cpu": ${cpu_cloudwatch_exporter},
+        "memory": ${memory_cloudwatch_exporter},
+        "memoryReservation": ${memory_reservation_cloudwatch_exporter},
+        "command": [
+          "/prometheus/cloudwatch_exporter.yml"
+        ],
+        "mountPoints": [
+          {
+            "containerPath": "/prometheus",
+            "sourceVolume": "prometheus",
+            "readOnly": null
+          }
+        ],
+        "portMappings": [
+          {
+            "hostPort": 0,
+            "containerPort": 9093
+          }
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "monitoring-${environment}",
+            "awslogs-region": "${aws_region}",
+            "awslogs-stream-prefix": "cloudwatch_exporter"
+          }
+        }
       }
 ]

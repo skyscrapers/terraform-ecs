@@ -61,11 +61,15 @@ variable "memory_reservation_alertmanager" {
 }
 
 variable "version_prometheus" {
-  default = "v2.2.1"
+  default = "v2.4.0"
 }
 
 variable "version_alertmanager" {
   default = "v0.15.1"
+}
+
+variable "version_cloudwatch_exporter" {
+  default = "cloudwatch_exporter-0.5.0"
 }
 
 variable "alb_arn" {}

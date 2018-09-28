@@ -25,13 +25,13 @@ data "template_file" "grafana" {
   template = "${file("${path.module}/task-definitions/grafana.json")}"
 
   vars {
-    aws_region                      = "${data.aws_region.current.name}"
-    cpu_grafana                     = "${var.cpu_grafana}"
-    memory_grafana                  = "${var.memory_grafana}"
-    memory_reservation_grafana      = "${var.memory_reservation_grafana}"
-    version_grafana                 = "${var.version_grafana}"
-    grafana_port                    = "${var.grafana_port}"
-    environment                     = "${var.environment}"
+    aws_region                 = "${data.aws_region.current.name}"
+    cpu_grafana                = "${var.cpu_grafana}"
+    memory_grafana             = "${var.memory_grafana}"
+    memory_reservation_grafana = "${var.memory_reservation_grafana}"
+    version_grafana            = "${var.version_grafana}"
+    grafana_port               = "${var.grafana_port}"
+    environment                = "${var.environment}"
   }
 }
 
@@ -168,6 +168,24 @@ resource "aws_security_group_rule" "inbound" {
   to_port           = "${var.prometheus_port}"
   protocol          = "tcp"
   cidr_blocks       = ["${var.vpc_cidr}"]
+}
+
+resource "aws_security_group_rule" "allow_ecs_node_monitor" {
+  type              = "ingress"
+  from_port         = 9100
+  to_port           = 9100
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+  self              = true
+}
+
+resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
+  type              = "egress"
+  from_port         = 9100
+  to_port           = 9100
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+  self              = true
 }
 
 resource "aws_route53_record" "prometheus" {
