@@ -14,7 +14,8 @@
           }
         ],
         "links": [
-          "alertmanager"
+          "alertmanager",
+          "cloudwatch_exporter"
         ],
         "mountPoints": [
           {
@@ -88,7 +89,7 @@
         "portMappings": [
           {
             "hostPort": 0,
-            "containerPort": 9093
+            "containerPort": 9106
           }
         ],
         "logConfiguration": {

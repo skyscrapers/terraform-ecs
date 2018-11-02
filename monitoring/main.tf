@@ -18,6 +18,10 @@ data "template_file" "monitoring" {
     memory_reservation_alertmanager = "${var.memory_reservation_alertmanager}"
     version_alertmanager            = "${var.version_alertmanager}"
     environment                     = "${var.environment}"
+    version_cloudwatch_exporter     = "${var.version_cloudwatch_exporter}"
+    cpu_cloudwatch_exporter = "${var.cpu_cloudwatch_exporter}"
+    memory_cloudwatch_exporter = "${var.memory_cloudwatch_exporter}"
+    memory_reservation_cloudwatch_exporter = "${var.memory_reservation_cloudwatch_exporter}"
   }
 }
 

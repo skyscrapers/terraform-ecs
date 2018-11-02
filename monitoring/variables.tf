@@ -101,3 +101,13 @@ variable "version_grafana" {
 variable "grafana_port" {
   default = "3000"
 }
+
+variable "cpu_cloudwatch_exporter" {
+  default = "100"
+}
+variable "memory_cloudwatch_exporter" {
+  default = "200"
+}
+variable "memory_reservation_cloudwatch_exporter" {
+  default = "100"
+}
