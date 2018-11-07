@@ -22,6 +22,7 @@ data "template_file" "monitoring" {
     cpu_cloudwatch_exporter = "${var.cpu_cloudwatch_exporter}"
     memory_cloudwatch_exporter = "${var.memory_cloudwatch_exporter}"
     memory_reservation_cloudwatch_exporter = "${var.memory_reservation_cloudwatch_exporter}"
+    monitoring_configs_bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
   }
 }
 
@@ -215,4 +216,70 @@ resource "aws_cloudwatch_log_group" "cwlogs" {
   tags {
     Environment = "${var.environment}"
   }
+}
+
+resource "aws_s3_bucket" "monitoring_configs_bucket" {
+  bucket = "monitoring-${var.environment}-${var.project}-state"
+  acl    = "private"
+
+  tags {
+    Name        = "monitoring-${var.environment}-${var.project}-configs"
+    Environment = "${var.environment}"
+    Project     = "${var.project}"
+  }
+}
+
+data template_file "alert_rules" {
+  template = "${file("${path.module}/templates/alert.rules")}"
+
+  vars {
+      }
+}
+
+data template_file "alertmanager_config" {
+  template = "${file("${path.module}/templates/alertmanager.yml")}"
+
+  vars {
+    opsgenie_api_key = "test"
+    environment = "${var.environment}"
+    project = "${var.project}"
+      }
+}
+
+data template_file "cloudwatch_exporter_config" {
+  template = "${file("${path.module}/templates/cloudwatch_exporter.yml")}"
+
+  vars {
+      }
+}
+
+data template_file "prometheus_config" {
+  template = "${file("${path.module}/templates/prometheus.yml")}"
+
+  vars {
+      }
+}
+
+resource "aws_s3_bucket_object" "alert_rules" {
+    bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+    key    = "alert.rules"
+    content = "${data.template_file.alert_rules.rendered}"
+}
+
+resource "aws_s3_bucket_object" "alertmanager_config" {
+    bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+    key    = "alertmanager.yml"
+    content = "${data.template_file.alertmanager_config.rendered}"
+}
+
+resource "aws_s3_bucket_object" "cloudwatch_exporter_config" {
+    bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+    key    = "cloudwatch_exporter.yml"
+    content = "${data.template_file.cloudwatch_exporter_config.rendered}"
+}
+
+resource "aws_s3_bucket_object" "prometheus_config" {
+    bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+    key    = "prometheus.yml"
+    content = "${data.template_file.prometheus_config.rendered}"
 }

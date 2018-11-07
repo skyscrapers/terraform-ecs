@@ -22,18 +22,26 @@ alerting:
       - "alertmanager:9093"
 
 scrape_configs:
-  # # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'prometheus'
+    scrape_interval: 15s
 
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'test'
+  - job_name: 'node-exporter'
     ec2_sd_configs:
       - region: eu-west-1
         port: 9100
         filters:
           - name: "tag:Environment"
-            values: ["staging"]
+            values: ["production"]
+          - name: "tag:Type"
+            values: ["ecs-cluster"]
+  - job_name: 'concourse'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['ci.skyscrape.rs:9391']
+  - job_name: 'cloudwatch'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ['cloudwatch_exporter:9106']

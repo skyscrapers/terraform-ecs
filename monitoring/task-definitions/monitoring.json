@@ -1,5 +1,33 @@
 [
       {
+        "name":"s3_download",
+        "image": "mesosphere/aws-cli:latest",
+        "essential": false,
+        "memoryReservation": 100,
+        "mountPoints": [
+          {
+            "containerPath": "/project",
+            "sourceVolume": "prometheus",
+            "readOnly": null
+          }
+        ],
+        "command": [
+          "s3",
+          "cp",
+          "s3://${monitoring_configs_bucket}",
+          ".",
+          "--recursive"
+        ],
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "monitoring-${environment}",
+            "awslogs-region": "${aws_region}",
+            "awslogs-stream-prefix": "s3_download"
+          }
+        }
+      },
+      {
         "name": "prometheus",
         "image": "prom/prometheus:${version_prometheus}",
         "essential": true,

@@ -56,7 +56,7 @@ groups:
       description: '{{$labels.instance}} is using more than 90% Memory for >1h '
       summary: Instance {{$labels.instance}} Memory usage high
   - alert: CPUUsageHigh
-    expr: 100 * (1 - avg by(instance) (irate(node_cpu{mode="idle"}[1h]))) >= 90
+    expr: 100 * (1 - avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1h]))) >= 90
     for: 1h
     labels:
       severity: warning
