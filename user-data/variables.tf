@@ -1,4 +1,4 @@
-monitoringvariable "environment" {}
+variable "environment" {}
 variable "project" {}
 variable "cluster_name" {}
 
