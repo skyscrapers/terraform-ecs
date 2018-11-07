@@ -106,9 +106,11 @@ variable "grafana_port" {
 variable "cpu_cloudwatch_exporter" {
   default = "100"
 }
+
 variable "memory_cloudwatch_exporter" {
   default = "200"
 }
+
 variable "memory_reservation_cloudwatch_exporter" {
   default = "100"
 }

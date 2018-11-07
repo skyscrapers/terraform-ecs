@@ -8,21 +8,21 @@ data "template_file" "monitoring" {
   template = "${file("${path.module}/task-definitions/monitoring.json")}"
 
   vars {
-    aws_region                      = "${data.aws_region.current.name}"
-    version_prometheus              = "${var.version_prometheus}"
-    cpu_prometheus                  = "${var.cpu_prometheus}"
-    memory_prometheus               = "${var.memory_prometheus}"
-    memory_reservation_prometheus   = "${var.memory_reservation_prometheus}"
-    cpu_alertmanager                = "${var.cpu_alertmanager}"
-    memory_alertmanager             = "${var.memory_alertmanager}"
-    memory_reservation_alertmanager = "${var.memory_reservation_alertmanager}"
-    version_alertmanager            = "${var.version_alertmanager}"
-    environment                     = "${var.environment}"
-    version_cloudwatch_exporter     = "${var.version_cloudwatch_exporter}"
-    cpu_cloudwatch_exporter = "${var.cpu_cloudwatch_exporter}"
-    memory_cloudwatch_exporter = "${var.memory_cloudwatch_exporter}"
+    aws_region                             = "${data.aws_region.current.name}"
+    version_prometheus                     = "${var.version_prometheus}"
+    cpu_prometheus                         = "${var.cpu_prometheus}"
+    memory_prometheus                      = "${var.memory_prometheus}"
+    memory_reservation_prometheus          = "${var.memory_reservation_prometheus}"
+    cpu_alertmanager                       = "${var.cpu_alertmanager}"
+    memory_alertmanager                    = "${var.memory_alertmanager}"
+    memory_reservation_alertmanager        = "${var.memory_reservation_alertmanager}"
+    version_alertmanager                   = "${var.version_alertmanager}"
+    environment                            = "${var.environment}"
+    version_cloudwatch_exporter            = "${var.version_cloudwatch_exporter}"
+    cpu_cloudwatch_exporter                = "${var.cpu_cloudwatch_exporter}"
+    memory_cloudwatch_exporter             = "${var.memory_cloudwatch_exporter}"
     memory_reservation_cloudwatch_exporter = "${var.memory_reservation_cloudwatch_exporter}"
-    monitoring_configs_bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+    monitoring_configs_bucket              = "${aws_s3_bucket.monitoring_configs_bucket.id}"
   }
 }
 
@@ -232,54 +232,51 @@ resource "aws_s3_bucket" "monitoring_configs_bucket" {
 data template_file "alert_rules" {
   template = "${file("${path.module}/templates/alert.rules")}"
 
-  vars {
-      }
+  vars {}
 }
 
 data template_file "alertmanager_config" {
   template = "${file("${path.module}/templates/alertmanager.yml")}"
 
   vars {
-    opsgenie_api_key = "test"
-    environment = "${var.environment}"
-    project = "${var.project}"
-      }
+    opsgenie_api_key = "${var.opsgenie_api_key}"
+    environment      = "${var.environment}"
+    project          = "${var.project}"
+  }
 }
 
 data template_file "cloudwatch_exporter_config" {
   template = "${file("${path.module}/templates/cloudwatch_exporter.yml")}"
 
-  vars {
-      }
+  vars {}
 }
 
 data template_file "prometheus_config" {
   template = "${file("${path.module}/templates/prometheus.yml")}"
 
-  vars {
-      }
+  vars {}
 }
 
 resource "aws_s3_bucket_object" "alert_rules" {
-    bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
-    key    = "alert.rules"
-    content = "${data.template_file.alert_rules.rendered}"
+  bucket  = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+  key     = "alert.rules"
+  content = "${data.template_file.alert_rules.rendered}"
 }
 
 resource "aws_s3_bucket_object" "alertmanager_config" {
-    bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
-    key    = "alertmanager.yml"
-    content = "${data.template_file.alertmanager_config.rendered}"
+  bucket  = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+  key     = "alertmanager.yml"
+  content = "${data.template_file.alertmanager_config.rendered}"
 }
 
 resource "aws_s3_bucket_object" "cloudwatch_exporter_config" {
-    bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
-    key    = "cloudwatch_exporter.yml"
-    content = "${data.template_file.cloudwatch_exporter_config.rendered}"
+  bucket  = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+  key     = "cloudwatch_exporter.yml"
+  content = "${data.template_file.cloudwatch_exporter_config.rendered}"
 }
 
 resource "aws_s3_bucket_object" "prometheus_config" {
-    bucket = "${aws_s3_bucket.monitoring_configs_bucket.id}"
-    key    = "prometheus.yml"
-    content = "${data.template_file.prometheus_config.rendered}"
+  bucket  = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+  key     = "prometheus.yml"
+  content = "${data.template_file.prometheus_config.rendered}"
 }
