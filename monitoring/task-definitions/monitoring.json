@@ -7,7 +7,7 @@
         "mountPoints": [
           {
             "containerPath": "/project",
-            "sourceVolume": "prometheus",
+            "sourceVolume": "monitoring",
             "readOnly": null
           }
         ],
@@ -47,21 +47,21 @@
         ],
         "mountPoints": [
           {
-            "containerPath": "/prometheus",
-            "sourceVolume": "prometheus",
+            "containerPath": "/monitoring",
+            "sourceVolume": "monitoring",
             "readOnly": null
           }
         ],
         "command": [
-          "--config.file=/prometheus/prometheus.yml",
-          "--storage.tsdb.path=/prometheus/data/"
+          "--config.file=/monitoring/prometheus.yml",
+          "--storage.tsdb.path=/monitoring/data/"
         ],
         "logConfiguration": {
           "logDriver": "awslogs",
           "options": {
             "awslogs-group": "monitoring-${environment}",
             "awslogs-region": "${aws_region}",
-            "awslogs-stream-prefix": "prometheus"
+            "awslogs-stream-prefix": "monitoring"
           }
         }
       },
@@ -73,12 +73,12 @@
         "memory": ${memory_alertmanager},
         "memoryReservation": ${memory_reservation_alertmanager},
         "command": [
-          "--config.file=/prometheus/alertmanager.yml"
+          "--config.file=/monitoring/alertmanager.yml"
         ],
         "mountPoints": [
           {
-            "containerPath": "/prometheus",
-            "sourceVolume": "prometheus",
+            "containerPath": "/monitoring",
+            "sourceVolume": "monitoring",
             "readOnly": null
           }
         ],
@@ -105,12 +105,12 @@
         "memory": ${memory_cloudwatch_exporter},
         "memoryReservation": ${memory_reservation_cloudwatch_exporter},
         "command": [
-          "/prometheus/cloudwatch_exporter.yml"
+          "/monitoring/cloudwatch_exporter.yml"
         ],
         "mountPoints": [
           {
-            "containerPath": "/prometheus",
-            "sourceVolume": "prometheus",
+            "containerPath": "/monitoring",
+            "sourceVolume": "monitoring",
             "readOnly": null
           }
         ],

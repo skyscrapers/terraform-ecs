@@ -44,11 +44,11 @@ resource "aws_ecs_task_definition" "monitoring" {
   family                = "monitoring-${var.environment}"
   network_mode          = "bridge"
   container_definitions = "${data.template_file.monitoring.rendered}"
-  task_role_arn         = "${aws_iam_role.prometheus.arn}"
+  task_role_arn         = "${aws_iam_role.monitoring.arn}"
 
   volume {
-    name      = "prometheus"
-    host_path = "/prometheus"
+    name      = "monitoring"
+    host_path = "/monitoring"
   }
 }
 
@@ -56,15 +56,15 @@ resource "aws_ecs_task_definition" "grafana" {
   family                = "grafana-${var.environment}"
   network_mode          = "bridge"
   container_definitions = "${data.template_file.grafana.rendered}"
-  task_role_arn         = "${aws_iam_role.prometheus.arn}"
+  task_role_arn         = "${aws_iam_role.monitoring.arn}"
 
   volume {
     name      = "grafana"
-    host_path = "/prometheus/grafana"
+    host_path = "/monitoring/grafana"
   }
 }
 
-resource "aws_ecs_service" "prometheus" {
+resource "aws_ecs_service" "monitoring" {
   name            = "monitoring"
   cluster         = "${var.cluster_name}"
   task_definition = "${aws_ecs_task_definition.monitoring.arn}"
@@ -77,7 +77,7 @@ resource "aws_ecs_service" "prometheus" {
   }
 
   load_balancer {
-    target_group_arn = "${aws_alb_target_group.prometheus.arn}"
+    target_group_arn = "${aws_lb_target_group.monitoring.arn}"
     container_name   = "prometheus"
     container_port   = "${var.prometheus_port}"
   }
@@ -102,10 +102,10 @@ resource "aws_ecs_service" "grafana" {
   }
 }
 
-module "alb_listener_prometheus" {
+module "alb_listener_monitoring" {
   source                      = "github.com/skyscrapers/terraform-loadbalancers//alb_listener?ref=6.0.0"
   environment                 = "${var.environment}"
-  project                     = "prometheus"
+  project                     = "monitoring"
   vpc_id                      = "${var.vpc_id}"
   name_prefix                 = "https"
   alb_arn                     = "${var.alb_arn}"
@@ -113,7 +113,7 @@ module "alb_listener_prometheus" {
   https_certificate_arn       = "${var.alb_ssl_cert}"
   ingress_port                = "${var.prometheus_port}"
   create_default_target_group = false
-  default_target_group_arn    = "${aws_alb_target_group.prometheus.arn}"
+  default_target_group_arn    = "${aws_lb_target_group.monitoring.arn}"
   source_subnet_cidrs         = "${var.source_subnet_cidrs}"
 
   tags = {
@@ -121,8 +121,8 @@ module "alb_listener_prometheus" {
   }
 }
 
-resource "aws_alb_target_group" "prometheus" {
-  name     = "prometheus-${var.environment}"
+resource "aws_lb_target_group" "monitoring" {
+  name     = "monitoring-${var.environment}"
   port     = "${var.prometheus_port}"
   protocol = "${var.protocol}"
   vpc_id   = "${var.vpc_id}"
@@ -152,7 +152,7 @@ resource "aws_lb_target_group" "grafana" {
 }
 
 resource "aws_lb_listener_rule" "grafana" {
-  listener_arn = "${module.alb_listener_prometheus.listener_id}"
+  listener_arn = "${module.alb_listener_monitoring.listener_id}"
   priority     = 2
 
   action {
@@ -193,9 +193,9 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
   self              = true
 }
 
-resource "aws_route53_record" "prometheus" {
+resource "aws_route53_record" "monitoring" {
   zone_id = "${data.aws_route53_zone.root.zone_id}"
-  name    = "prometheus.${var.r53_zone_prefix}${var.r53_zone}"
+  name    = "monitoring.${var.r53_zone_prefix}${var.r53_zone}"
   type    = "CNAME"
   records = ["${var.alb_dns_name}"]
   ttl     = "60"

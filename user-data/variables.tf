@@ -1,4 +1,4 @@
-variable "environment" {}
+monitoringvariable "environment" {}
 variable "project" {}
 variable "cluster_name" {}
 
@@ -15,7 +15,7 @@ variable "teleport_auth_token" {
 }
 
 variable "efs_mount_point" {
-  default = "/prometheus"
+  default = "/monitoring"
 }
 
 variable "efs_id" {
