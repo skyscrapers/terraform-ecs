@@ -70,8 +70,6 @@ EOF
     content_type = "text/cloud-config"
 
     content = <<EOF
-#cloud-config
-package_upgrade: true
 packages:
 - nfs-utils
 runcmd:
