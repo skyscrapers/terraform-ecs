@@ -9,8 +9,7 @@
         "mountPoints": [
           {
             "containerPath": "/var/lib/grafana",
-            "sourceVolume": "grafana",
-            "readOnly": null
+            "sourceVolume": "grafana"
           }
         ],
         "portMappings": [
