@@ -232,7 +232,9 @@ resource "aws_s3_bucket" "monitoring_configs_bucket" {
 data template_file "alert_rules" {
   template = "${file("${path.module}/templates/alert.rules")}"
 
-  vars {}
+  vars {
+    custom_alert_rules = "${indent(2,var.custom_alert_rules)}"
+  }
 }
 
 data template_file "alertmanager_config" {
@@ -242,19 +244,27 @@ data template_file "alertmanager_config" {
     opsgenie_api_key = "${var.opsgenie_api_key}"
     environment      = "${var.environment}"
     project          = "${var.project}"
+    slack_channel    = "${var.slack_channel}"
+    slack_url        = "${var.slack_url}"
   }
 }
 
 data template_file "cloudwatch_exporter_config" {
   template = "${file("${path.module}/templates/cloudwatch_exporter.yml")}"
 
-  vars {}
+  vars {
+    cloudwatch_metrics = "${indent(2,var.cloudwatch_metrics)}"
+  }
 }
 
 data template_file "prometheus_config" {
   template = "${file("${path.module}/templates/prometheus.yml")}"
 
-  vars {}
+  vars {
+    concourse_url    = "${var.concourse_url}"
+    custom_jobs      = "${indent(2,var.custom_jobs)}"
+    environment      = "${var.environment}"
+  }
 }
 
 resource "aws_s3_bucket_object" "alert_rules" {

@@ -5,8 +5,8 @@ receivers:
     - name: 'slack'
       slack_configs:
           - send_resolved: true
-            channel: '#test'
-            api_url: '...'
+            channel: '${slack_channel}'
+            api_url: '${slack_url}'
     - name: 'opsgenie'
       opsgenie_configs:
         - api_key: '${opsgenie_api_key}'

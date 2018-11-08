@@ -114,3 +114,26 @@ variable "memory_cloudwatch_exporter" {
 variable "memory_reservation_cloudwatch_exporter" {
   default = "100"
 }
+
+variable "opsgenie_api_key" {}
+
+variable "slack_channel" {}
+variable "slack_url" {}
+variable "custom_jobs" {
+  default = ""
+}
+variable "concourse_url" {}
+
+variable "cloudwatch_metrics" {
+  default = <<EOF
+- aws_namespace: AWS/ELB
+  aws_metric_name: RequestCount
+  aws_dimensions: [AvailabilityZone, LoadBalancerName]
+  aws_dimension_select:
+    LoadBalancerName: [myLB]
+  aws_statistics: [Sum]
+EOF
+}
+variable "custom_alert_rules" {
+  default = ""
+}

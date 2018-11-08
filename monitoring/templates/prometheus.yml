@@ -34,14 +34,15 @@ scrape_configs:
         port: 9100
         filters:
           - name: "tag:Environment"
-            values: ["production"]
+            values: ["${environment}"]
           - name: "tag:Type"
             values: ["ecs-cluster"]
   - job_name: 'concourse'
     scrape_interval: 15s
     static_configs:
-      - targets: ['ci.skyscrape.rs:9391']
+      - targets: ['${concourse_url}:9391']
   - job_name: 'cloudwatch'
     scrape_interval: 1m
     static_configs:
       - targets: ['cloudwatch_exporter:9106']
+  ${custom_jobs}
