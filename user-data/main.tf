@@ -1,9 +1,9 @@
-data "template_file" "prometheus_service_cloudinit" {
-  template = "${file("${path.module}/templates/prometheus.service.tpl")}"
+data "template_file" "node_exporter_service_cloudinit" {
+  template = "${file("${path.module}/templates/node-exporter.service.tpl")}"
 
   vars {
-    prometheus_service = "${indent(4,file("${path.module}/templates/prometheus-upstart.conf"))}"
-    service_type_path  = "/etc/init.d/prometheus"
+    node_exporter_service = "${indent(4,file("${path.module}/templates/node-exporter-upstart.conf"))}"
+    service_type_path  = "/etc/init.d/node_exporter"
     file_permissions   = "0755"
   }
 }
@@ -29,7 +29,7 @@ data "template_cloudinit_config" "teleport_bootstrap" {
 write_files:
 ${module.teleport_bootstrap_script.teleport_config_cloudinit}
 ${module.teleport_bootstrap_script.teleport_service_cloudinit}
-${data.template_file.prometheus_service_cloudinit.rendered}
+${data.template_file.node_exporter_service_cloudinit.rendered}
 EOF
   }
 
@@ -56,7 +56,7 @@ chmod +x /usr/local/bin/node_exporter
 
 echo ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config
 start ecs
-service prometheus start
+service node_exporter start
 EOF
   }
 
