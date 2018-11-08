@@ -137,3 +137,11 @@ EOF
 variable "custom_alert_rules" {
   default = ""
 }
+
+variable "efs_subnets" {
+  type = "list"
+}
+
+variable "mount_point" {
+  default = "/monitoring"
+}

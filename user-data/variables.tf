@@ -15,11 +15,7 @@ variable "teleport_auth_token" {
 }
 
 variable "efs_mount_point" {
-  default = "/monitoring"
-}
-
-variable "efs_id" {
-  default = ""
+  default = "/efs"
 }
 
 variable "efs_dns_name" {

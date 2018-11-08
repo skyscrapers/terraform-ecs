@@ -48,7 +48,7 @@ resource "aws_ecs_task_definition" "monitoring" {
 
   volume {
     name      = "monitoring"
-    host_path = "/monitoring"
+    host_path = "${var.mount_point}"
   }
 }
 
@@ -60,7 +60,7 @@ resource "aws_ecs_task_definition" "grafana" {
 
   volume {
     name      = "grafana"
-    host_path = "/monitoring/grafana"
+    host_path = "${var.mount_point}/grafana"
   }
 }
 
