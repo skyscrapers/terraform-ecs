@@ -122,7 +122,9 @@ variable "slack_url" {}
 variable "custom_jobs" {
   default = ""
 }
-variable "concourse_url" {}
+variable "concourse_url" {
+  default = ""
+}
 
 variable "cloudwatch_metrics" {
   default = <<EOF
