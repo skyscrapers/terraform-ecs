@@ -37,10 +37,7 @@ scrape_configs:
             values: ["${environment}"]
           - name: "tag:Type"
             values: ["ecs-cluster"]
-  - job_name: 'concourse'
-    scrape_interval: 15s
-    static_configs:
-      - targets: ['${concourse_url}:9391']
+  ${concourse_monitor}
   - job_name: 'cloudwatch'
     scrape_interval: 1m
     static_configs:

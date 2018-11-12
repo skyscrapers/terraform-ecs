@@ -4,6 +4,14 @@ data "aws_route53_zone" "root" {
 
 data "aws_region" "current" {}
 
+locals {
+  concourse_monitor = <<EOF
+- job_name: 'concourse'
+  scrape_interval: 15s
+  static_configs:
+    - targets: ['${var.concourse_url}:9391']
+EOF
+}
 data "template_file" "monitoring" {
   template = "${file("${path.module}/task-definitions/monitoring.json")}"
 
@@ -261,7 +269,7 @@ data template_file "prometheus_config" {
   template = "${file("${path.module}/templates/prometheus.yml")}"
 
   vars {
-    concourse_url    = "${var.concourse_url}"
+    concourse_monitor= "${var.concourse_url == "" ? "": indent(2,local.concourse_monitor)}"
     custom_jobs      = "${indent(2,var.custom_jobs)}"
     environment      = "${var.environment}"
   }
