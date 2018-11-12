@@ -23,39 +23,39 @@ variable "r53_zone_prefix" {
   default = ""
 }
 
-variable "cpu_prometheus" {
+variable "prometheus_cpu" {
   default = "0"
 }
 
-variable "memory_prometheus" {
+variable "prometheus_memory" {
   default = "100"
 }
 
-variable "memory_reservation_prometheus" {
+variable "prometheus_memory_reservation" {
   default = "100"
 }
 
-variable "cpu_alertmanager" {
+variable "alertmanager_cpu" {
   default = "0"
 }
 
-variable "memory_alertmanager" {
+variable "alertmanager_memory" {
   default = "100"
 }
 
-variable "memory_reservation_alertmanager" {
+variable "alertmanager_memory_reservation" {
   default = "100"
 }
 
-variable "version_prometheus" {
+variable "prometheus_version" {
   default = "v2.4.0"
 }
 
-variable "version_alertmanager" {
+variable "alertmanager_version" {
   default = "v0.15.1"
 }
 
-variable "version_cloudwatch_exporter" {
+variable "cloudwatch_exporter_version" {
   default = "cloudwatch_exporter-0.5.0"
 }
 
@@ -69,19 +69,19 @@ variable "source_subnet_cidrs" {
   type = "list"
 }
 
-variable "cpu_grafana" {
+variable "grafana_cpu" {
   default = "0"
 }
 
-variable "memory_grafana" {
+variable "grafana_memory" {
   default = "100"
 }
 
-variable "memory_reservation_grafana" {
+variable "grafana_memory_reservation" {
   default = "100"
 }
 
-variable "version_grafana" {
+variable "grafana_version" {
   default = "latest"
 }
 
@@ -89,15 +89,15 @@ variable "grafana_port" {
   default = "3000"
 }
 
-variable "cpu_cloudwatch_exporter" {
+variable "cloudwatch_exporter_cpu" {
   default = "100"
 }
 
-variable "memory_cloudwatch_exporter" {
+variable "cloudwatch_exporter_memory" {
   default = "200"
 }
 
-variable "memory_reservation_cloudwatch_exporter" {
+variable "cloudwatch_exporter_memory_reservation" {
   default = "100"
 }
 

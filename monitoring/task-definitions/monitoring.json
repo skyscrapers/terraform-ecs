@@ -28,11 +28,11 @@
       },
       {
         "name": "prometheus",
-        "image": "prom/prometheus:${version_prometheus}",
+        "image": "prom/prometheus:${prometheus_version}",
         "essential": true,
-        "cpu": ${cpu_prometheus},
-        "memory": ${memory_prometheus},
-        "memoryReservation": ${memory_reservation_prometheus},
+        "cpu": ${prometheus_cpu},
+        "memory": ${prometheus_memory},
+        "memoryReservation": ${prometheus_memory_reservation},
         "portMappings": [
           {
             "hostPort": 9090,
@@ -65,11 +65,11 @@
       },
       {
         "name": "alertmanager",
-        "image": "prom/alertmanager:${version_alertmanager}",
+        "image": "prom/alertmanager:${alertmanager_version}",
         "essential": true,
-        "cpu": ${cpu_alertmanager},
-        "memory": ${memory_alertmanager},
-        "memoryReservation": ${memory_reservation_alertmanager},
+        "cpu": ${alertmanager_cpu},
+        "memory": ${alertmanager_memory},
+        "memoryReservation": ${alertmanager_memory_reservation},
         "command": [
           "--config.file=/monitoring/alertmanager.yml"
         ],
@@ -96,11 +96,11 @@
       },
       {
         "name": "cloudwatch_exporter",
-        "image": "prom/cloudwatch-exporter:${version_cloudwatch_exporter}",
+        "image": "prom/cloudwatch-exporter:${cloudwatch_exporter_version}",
         "essential": true,
-        "cpu": ${cpu_cloudwatch_exporter},
-        "memory": ${memory_cloudwatch_exporter},
-        "memoryReservation": ${memory_reservation_cloudwatch_exporter},
+        "cpu": ${cloudwatch_exporter_cpu},
+        "memory": ${cloudwatch_exporter_memory},
+        "memoryReservation": ${cloudwatch_exporter_memory_reservation},
         "command": [
           "/monitoring/cloudwatch_exporter.yml"
         ],

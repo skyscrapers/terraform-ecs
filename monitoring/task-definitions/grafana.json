@@ -1,11 +1,11 @@
 [
       {
         "name": "grafana",
-        "image": "grafana/grafana:${version_grafana}",
+        "image": "grafana/grafana:${grafana_version}",
         "essential": true,
-        "cpu": ${cpu_grafana},
-        "memory": ${memory_grafana},
-        "memoryReservation": ${memory_reservation_grafana},
+        "cpu": ${grafana_cpu},
+        "memory": ${grafana_memory},
+        "memoryReservation": ${grafana_memory_reservation},
         "mountPoints": [
           {
             "containerPath": "/var/lib/grafana",

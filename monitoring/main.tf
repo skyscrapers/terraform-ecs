@@ -17,19 +17,19 @@ data "template_file" "monitoring" {
 
   vars {
     aws_region                             = "${data.aws_region.current.name}"
-    version_prometheus                     = "${var.version_prometheus}"
-    cpu_prometheus                         = "${var.cpu_prometheus}"
-    memory_prometheus                      = "${var.memory_prometheus}"
-    memory_reservation_prometheus          = "${var.memory_reservation_prometheus}"
-    cpu_alertmanager                       = "${var.cpu_alertmanager}"
-    memory_alertmanager                    = "${var.memory_alertmanager}"
-    memory_reservation_alertmanager        = "${var.memory_reservation_alertmanager}"
-    version_alertmanager                   = "${var.version_alertmanager}"
+    prometheus_version                     = "${var.prometheus_version}"
+    prometheus_cpu                         = "${var.prometheus_cpu}"
+    prometheus_memory                      = "${var.prometheus_memory}"
+    prometheus_memory_reservation          = "${var.prometheus_memory_reservation}"
+    alertmanager_cpu                       = "${var.alertmanager_cpu}"
+    alertmanager_memory                    = "${var.alertmanager_memory}"
+    alertmanager_memory_reservation        = "${var.alertmanager_memory_reservation}"
+    alertmanager_version                   = "${var.alertmanager_version}"
     environment                            = "${var.environment}"
-    version_cloudwatch_exporter            = "${var.version_cloudwatch_exporter}"
-    cpu_cloudwatch_exporter                = "${var.cpu_cloudwatch_exporter}"
-    memory_cloudwatch_exporter             = "${var.memory_cloudwatch_exporter}"
-    memory_reservation_cloudwatch_exporter = "${var.memory_reservation_cloudwatch_exporter}"
+    cloudwatch_exporter_version            = "${var.cloudwatch_exporter_version}"
+    cloudwatch_exporter_cpu                = "${var.cloudwatch_exporter_cpu}"
+    cloudwatch_exporter_memory             = "${var.cloudwatch_exporter_memory}"
+    cloudwatch_exporter_memory_reservation = "${var.cloudwatch_exporter_memory_reservation}"
     monitoring_configs_bucket              = "${aws_s3_bucket.monitoring_configs_bucket.id}"
   }
 }
@@ -39,10 +39,10 @@ data "template_file" "grafana" {
 
   vars {
     aws_region                 = "${data.aws_region.current.name}"
-    cpu_grafana                = "${var.cpu_grafana}"
-    memory_grafana             = "${var.memory_grafana}"
-    memory_reservation_grafana = "${var.memory_reservation_grafana}"
-    version_grafana            = "${var.version_grafana}"
+    grafana_cpu                = "${var.grafana_cpu}"
+    grafana_memory             = "${var.grafana_memory}"
+    grafana_memory_reservation = "${var.grafana_memory_reservation}"
+    grafana_version            = "${var.grafana_version}"
     grafana_port               = "${var.grafana_port}"
     environment                = "${var.environment}"
   }
