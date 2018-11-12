@@ -82,15 +82,15 @@ The basic configuration includes the option to scrape for cloudwatch_metrics, an
 It also allows to scrape for concourse metrics and to add any custom configuration.
 
 ### Available variables:
- * [`environment"`]: String(required):  For what environment is this cluster needed (eg staging, production, ...)
- * [`project"`]: String(required): The project to tag Monitoring values
- * [`cluster_name"`]: String(required): The name of the ECS cluster.
- * [`ecs_service_role"`]: String(required): The name of the ECS IAM service role.
+ * [`environment`]: String(required):  For what environment is this cluster needed (eg staging, production, ...)
+ * [`project`]: String(required): The project to tag Monitoring values
+ * [`cluster_name`]: String(required): The name of the ECS cluster.
+ * [`ecs_service_role`]: String(required): The name of the ECS IAM service role.
  * [`desired_count`]: String(optional): The desired number of replicas of the ECS service for grafana and prometheus. (default: 1)
  * [`prometheus_port`]: String(optional): The port where prometheus listens to (default: 9090)
- * [`vpc_id"`]: String(required): The VPC where the ECS cluster is
- * [`ecs_sg"`]: String(required):The ECS security group
- * [`r53_zone"`]: String(required): The DNS zone for prometheus and grafana
+ * [`vpc_id`]: String(required): The VPC where the ECS cluster is
+ * [`ecs_sg`]: String(required):The ECS security group
+ * [`r53_zone`]: String(required): The DNS zone for prometheus and grafana
  * [`r53_zone_prefix`]: String(optional): The DNS zone prefix for prometheus and grafana (default: "")
  * [`cpu_prometheus`]: String(optional): The cpu dedicated to prometheus. (default: 0)
  * [`memory_prometheus`]: String(optional): The memory dedicated to prometheus. (default: 100)
@@ -108,14 +108,14 @@ It also allows to scrape for concourse metrics and to add any custom configurati
  * [`version_alertmanager`]: String(optional): The version of the alertmanager docker image . (default: v0.15.1)
  * [`version_cloudwatch_exporter`]: String(optional): The version of the cloudwatch exporter docker image . (default: cloudwatch_exporter-0.5.0)
  * [`version_grafana`]: String(optional): The version of the grafana's docker image . (default: latest)
- * [`alb_arn"`]: String(required): The arn of the alb.
- * [`alb_sg_id"`]: String(required): The security group of the alb.
- * [`alb_ssl_cert"`]:String(required): The certificate ARN of the alb.
+ * [`alb_arn`]: String(required): The arn of the alb.
+ * [`alb_sg_id`]: String(required): The security group of the alb.
+ * [`alb_ssl_cert`]:String(required): The certificate ARN of the alb.
  * [`source_subnet_cidrs`]: List(required): The public CIDRs from where the prometheus monitoring is accessible.
  * [`grafana_port`]: String(optional): The default grafana port the container is listening to. (default: 3000)
- * [`opsgenie_api_key"`]: String(required): The opsgenie api key for alerting.  
- * [`slack_channel"`]:  String(required): The slack channel where the alerts will be sent.  
- * [`slack_url"`]: String(required): The slack webhook used to access slack alerting.
+ * [`opsgenie_api_key`]: String(required): The opsgenie api key for alerting.  
+ * [`slack_channel`]:  String(required): The slack channel where the alerts will be sent.  
+ * [`slack_url`]: String(required): The slack webhook used to access slack alerting.
  * [`concourse_url`]: String(optional): Optional concourse URL to monitor. If not specified concourse won't be monitored. (default:"")
  * [`cloudwatch_metrics`]: String(optional): Optional additional metrics scraping jobs. (default:"")
  An example metric:
