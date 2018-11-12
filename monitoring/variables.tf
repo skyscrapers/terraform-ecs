@@ -13,29 +13,15 @@ variable "prometheus_port" {
   default = "9090"
 }
 
-variable "protocol" {
-  default = "HTTP"
-}
-
-variable "https_listener" {}
-
 variable "vpc_id" {}
 
 variable "ecs_sg" {}
-
-variable "vpc_cidr" {}
-
-variable "priority" {
-  default = "1"
-}
 
 variable "r53_zone" {}
 
 variable "r53_zone_prefix" {
   default = ""
 }
-
-variable "alb_dns_name" {}
 
 variable "cpu_prometheus" {
   default = "0"
@@ -127,14 +113,7 @@ variable "concourse_url" {
 }
 
 variable "cloudwatch_metrics" {
-  default = <<EOF
-- aws_namespace: AWS/ELB
-  aws_metric_name: RequestCount
-  aws_dimensions: [AvailabilityZone, LoadBalancerName]
-  aws_dimension_select:
-    LoadBalancerName: [myLB]
-  aws_statistics: [Sum]
-EOF
+  default = ""
 }
 variable "custom_alert_rules" {
   default = ""

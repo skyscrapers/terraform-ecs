@@ -132,7 +132,7 @@ module "alb_listener_monitoring" {
 resource "aws_lb_target_group" "monitoring" {
   name     = "monitoring-${var.environment}"
   port     = "${var.prometheus_port}"
-  protocol = "${var.protocol}"
+  protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
 
   health_check {
@@ -147,7 +147,7 @@ resource "aws_lb_target_group" "monitoring" {
 resource "aws_lb_target_group" "grafana" {
   name     = "grafana-${var.environment}"
   port     = "${var.grafana_port}"
-  protocol = "${var.protocol}"
+  protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
 
   health_check {
@@ -174,13 +174,17 @@ resource "aws_lb_listener_rule" "grafana" {
   }
 }
 
+data "aws_vpc" "current" {
+  id = "${var.vpc_id}"
+}
+
 resource "aws_security_group_rule" "inbound" {
   security_group_id = "${var.ecs_sg}"
   type              = "ingress"
   from_port         = "${var.prometheus_port}"
   to_port           = "${var.prometheus_port}"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.vpc_cidr}"]
+  cidr_blocks       = ["${data.aws_vpc.current.cidr_block}"]
 }
 
 resource "aws_security_group_rule" "allow_ecs_node_monitor" {
@@ -201,20 +205,32 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
   self              = true
 }
 
+data "aws_lb" "alb" {
+  arn  = "${var.alb_arn}"
+}
+
 resource "aws_route53_record" "monitoring" {
   zone_id = "${data.aws_route53_zone.root.zone_id}"
   name    = "monitoring.${var.r53_zone_prefix}${var.r53_zone}"
-  type    = "CNAME"
-  records = ["${var.alb_dns_name}"]
-  ttl     = "60"
+  type    = "A"
+
+  alias {
+    name                   = "${data.aws_lb.alb.dns_name}"
+    zone_id                = "${data.aws_lb.alb.zone_id}"
+    evaluate_target_health = false
+  }
 }
 
 resource "aws_route53_record" "grafana" {
   zone_id = "${data.aws_route53_zone.root.zone_id}"
   name    = "grafana.${var.r53_zone_prefix}${var.r53_zone}"
-  type    = "CNAME"
-  records = ["${var.alb_dns_name}"]
-  ttl     = "60"
+  type    = "A"
+
+  alias {
+    name                   = "${data.aws_lb.alb.dns_name}"
+    zone_id                = "${data.aws_lb.alb.zone_id}"
+    evaluate_target_health = false
+  }
 }
 
 resource "aws_cloudwatch_log_group" "cwlogs" {
