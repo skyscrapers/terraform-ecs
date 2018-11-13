@@ -243,7 +243,7 @@ resource "aws_cloudwatch_log_group" "cwlogs" {
 }
 
 resource "aws_s3_bucket" "monitoring_configs_bucket" {
-  bucket = "monitoring-${var.environment}-${var.project}-state"
+  bucket = "monitoring-${var.environment}-${var.project}-configs"
   acl    = "private"
 
   tags {
