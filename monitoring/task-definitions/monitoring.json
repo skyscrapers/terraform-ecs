@@ -6,7 +6,7 @@
         "memoryReservation": 100,
         "mountPoints": [
           {
-            "containerPath": "/project",
+            "containerPath": "/monitoring",
             "sourceVolume": "monitoring"
           }
         ],
@@ -14,7 +14,7 @@
           "s3",
           "cp",
           "s3://${monitoring_configs_bucket}",
-          ".",
+          "/monitoring/",
           "--recursive"
         ],
         "logConfiguration": {
@@ -44,10 +44,9 @@
           "alertmanager",
           "cloudwatch_exporter"
         ],
-        "mountPoints": [
+        "volumesFrom": [
           {
-            "containerPath": "/monitoring",
-            "sourceVolume": "monitoring"
+            "sourceContainer": "s3_download"
           }
         ],
         "command": [
@@ -73,10 +72,9 @@
         "command": [
           "--config.file=/monitoring/alertmanager.yml"
         ],
-        "mountPoints": [
+        "volumesFrom": [
           {
-            "containerPath": "/monitoring",
-            "sourceVolume": "monitoring"
+            "sourceContainer": "s3_download"
           }
         ],
         "portMappings": [
@@ -104,10 +102,9 @@
         "command": [
           "/monitoring/cloudwatch_exporter.yml"
         ],
-        "mountPoints": [
+        "volumesFrom": [
           {
-            "containerPath": "/monitoring",
-            "sourceVolume": "monitoring"
+            "sourceContainer": "s3_download"
           }
         ],
         "portMappings": [
