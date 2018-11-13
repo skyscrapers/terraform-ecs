@@ -145,21 +145,20 @@ module "monitoring" {
   source              = "monitoring"
   environment         = "${terraform.workspace}"
   project             = "${var.project}"
-  cluster_name        = "${module.ecs_cluster.cluster_name}"
-  ecs_service_role    = "${module.ecs_cluster.ecs-service-role}"
-  ecs_sg              = "${aws_security_group.sg_ecs_instance.id}"
-  https_listener      = "${data.terraform_remote_state.static.public_https_listener_id}"
-  vpc_id              = "${data.terraform_remote_state.static.vpc_id}"
+  cluster_name        = "cluster_name"
+  ecs_service_role    = "arn:aws:iam:::role/ecs-service-role "
+  ecs_sg              = "sg-123456789"
+  vpc_id              = "vpc-123456789"
   r53_zone            = "production.example.com"
-  alb_arn             = "${data.terraform_remote_state.static.public_alb_arn}"
-  alb_sg_id           = "${data.terraform_remote_state.static.public_alb_sg_id}"
-  alb_ssl_cert        = "${data.terraform_remote_state.static.app_lb_certificate_arn}"
+  alb_arn             = "arn:aws:elasticloadbalancing::::loadbalancer/app/xxxxxxxxxx/xxxxxxxxxxxx"
+  alb_sg_id           = "sg-123456789"
+  alb_ssl_cert        = "arn:aws:acm:"
   source_subnet_cidrs = ["1.1.1.1/32"]
-  slack_channel       = "${var.slack_channel}"
-  slack_url           = "${data.aws_kms_secrets.secret.plaintext["slack_url"]}"
-  opsgenie_api_key    = "${data.aws_kms_secrets.secret.plaintext["opsgenie_api_key"]}"
+  slack_channel       = "#example"
+  slack_url           = "https://hooks.slack.com/services/xxxxxx/xxxxxxx"
+  opsgenie_api_key    = "opsgenie_api_key"
   concourse_url       = "ci.example.com"
-  efs_subnets         = ["${data.terraform_remote_state.static.private_db_subnets}"]
+  efs_subnets         = ["subnet-12345678"]
 }
 ```
 
