@@ -133,7 +133,7 @@ EOF
  * [`custom_alert_rules`]: String(optional): Optional additional alert rules for alertmanager (default:"")
  * [`efs_subnets`]: List(required): The subnets where we want to deploy the required efs file system
  * [`mount_point`]: String(optional): The mount point where we want to mount EFS in the ECS nodes. (default:"/monitoring")
-
+ * [`opsgenie_heartbeat`]: String(required): The heartbeat Opsgenie Name for the ECS cluster.
  ### Output
  * [`alb_listener`]: The id of the ALB listener created for monitoring.
  * [`efs_mount_point`]: The mount point where we want to mount EFS in the ECS nodes.
@@ -159,6 +159,7 @@ module "monitoring" {
   opsgenie_api_key    = "opsgenie_api_key"
   concourse_url       = "ci.example.com"
   efs_subnets         = ["subnet-12345678"]
+  opsgenie_heartbeat  = "TestHeartbeat"
 }
 ```
 

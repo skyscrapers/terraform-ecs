@@ -7,10 +7,10 @@ route:
     - receiver: slack
       match:
         severity: warning
-    - receiver: opsgenie
+    - receiver: 'opsgenie'
       match:
         severity: critical
-    - receiver: opsgenie
+    - receiver: 'opsgenie-heartbeat'
       match:
         alertname: DeadMansSwitch
       group_wait: 1s
@@ -26,5 +26,10 @@ receivers:
         channel: '${slack_channel}'
   - name: 'opsgenie'
     opsgenie_configs:
-      - api_key: '${opsgenie_api_key}'
+      - send_resolved: true
+        api_key: '${opsgenie_api_key}'
         tags: sla_${environment},ecs,client_${project}
+  - name: 'opsgenie-heartbeat'
+    webhook_configs:
+    - url: 'https://api.opsgenie.com/v2/heartbeats/${opsgenie_heartbeat}/ping?apiKey=${opsgenie_api_key}'
+      send_resolved: true

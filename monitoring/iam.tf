@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "monitoring" {
 }
 
 resource "aws_iam_role" "monitoring" {
-  name = "monitoring-task-role-${var.environment}"
+  name               = "monitoring-task-role-${var.environment}"
   assume_role_policy = "${data.aws_iam_policy_document.monitoring.json}"
 }
 

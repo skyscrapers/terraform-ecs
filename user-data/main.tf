@@ -3,8 +3,8 @@ data "template_file" "node_exporter_service_cloudinit" {
 
   vars {
     node_exporter_service = "${indent(4,file("${path.module}/templates/node-exporter-upstart.conf"))}"
-    service_type_path  = "/etc/init.d/node_exporter"
-    file_permissions   = "0755"
+    service_type_path     = "/etc/init.d/node_exporter"
+    file_permissions      = "0755"
   }
 }
 

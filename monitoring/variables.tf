@@ -105,9 +105,11 @@ variable "opsgenie_api_key" {}
 
 variable "slack_channel" {}
 variable "slack_url" {}
+
 variable "custom_jobs" {
   default = ""
 }
+
 variable "concourse_url" {
   default = ""
 }
@@ -115,6 +117,7 @@ variable "concourse_url" {
 variable "cloudwatch_metrics" {
   default = ""
 }
+
 variable "custom_alert_rules" {
   default = ""
 }
@@ -126,3 +129,5 @@ variable "efs_subnets" {
 variable "mount_point" {
   default = "/monitoring"
 }
+
+variable "opsgenie_heartbeat" {}

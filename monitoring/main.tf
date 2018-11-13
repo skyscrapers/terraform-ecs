@@ -12,6 +12,7 @@ locals {
     - targets: ['${var.concourse_url}:9391']
 EOF
 }
+
 data "template_file" "monitoring" {
   template = "${file("${path.module}/task-definitions/monitoring.json")}"
 
@@ -206,7 +207,7 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
 }
 
 data "aws_lb" "alb" {
-  arn  = "${var.alb_arn}"
+  arn = "${var.alb_arn}"
 }
 
 resource "aws_route53_record" "monitoring" {
@@ -265,11 +266,12 @@ data template_file "alertmanager_config" {
   template = "${file("${path.module}/templates/alertmanager.yml")}"
 
   vars {
-    opsgenie_api_key = "${var.opsgenie_api_key}"
-    environment      = "${var.environment}"
-    project          = "${var.project}"
-    slack_channel    = "${var.slack_channel}"
-    slack_url        = "${var.slack_url}"
+    opsgenie_api_key   = "${var.opsgenie_api_key}"
+    opsgenie_heartbeat = "${var.opsgenie_heartbeat}"
+    environment        = "${var.environment}"
+    project            = "${var.project}"
+    slack_channel      = "${var.slack_channel}"
+    slack_url          = "${var.slack_url}"
   }
 }
 
@@ -285,9 +287,9 @@ data template_file "prometheus_config" {
   template = "${file("${path.module}/templates/prometheus.yml")}"
 
   vars {
-    concourse_monitor= "${var.concourse_url == "" ? "": indent(2,local.concourse_monitor)}"
-    custom_jobs      = "${indent(2,var.custom_jobs)}"
-    environment      = "${var.environment}"
+    concourse_monitor = "${var.concourse_url == "" ? "": indent(2,local.concourse_monitor)}"
+    custom_jobs       = "${indent(2,var.custom_jobs)}"
+    environment       = "${var.environment}"
   }
 }
 
