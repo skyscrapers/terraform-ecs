@@ -1,0 +1,4 @@
+---
+region: eu-west-1
+metrics:
+  ${cloudwatch_metrics}
