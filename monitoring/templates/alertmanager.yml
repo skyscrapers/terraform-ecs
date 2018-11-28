@@ -22,7 +22,8 @@ route:
 receivers:
   - name: 'slack'
     slack_configs:
-      - send_resolved: true
+      - username: ${project}-${environment}-ecs
+        send_resolved: true
         channel: '${slack_channel}'
   - name: 'opsgenie'
     opsgenie_configs:
