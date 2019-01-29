@@ -10,10 +10,10 @@ params:
   TF_PROJECT_FOLDER:
   TF_VERSION: "0.11.7"
   AWS_DEFAULT_REGION: eu-west-1
-  ROLE_TO_ASSUME: ops/terraform
   TIMEOUT: 500
   TF_ENVIRONMENT:
-  AWS_ACCOUNT_ID:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
 
 inputs:
 - name: terraform-repo
@@ -36,13 +36,6 @@ run:
 
     # Install dependencies of the deployment script
     pip install -r terraform-ecs/ci/ecs/requirements.txt
-
-
-    # Assume Role in the destination AWS account
-    ASSUMED_ROLE=$(aws sts assume-role --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/${ROLE_TO_ASSUME} --role-session-name concourse-ecs-update)
-    export AWS_ACCESS_KEY_ID=$(echo "$ASSUMED_ROLE" | jq -r ".Credentials.AccessKeyId")
-    export AWS_SECRET_ACCESS_KEY=$(echo "$ASSUMED_ROLE" | jq -r ".Credentials.SecretAccessKey")
-    export AWS_SESSION_TOKEN=$(echo "$ASSUMED_ROLE" | jq -r ".Credentials.SessionToken")
 
     # Extract AMI id from packer manifest
     if [ -d "ami" ]; then
