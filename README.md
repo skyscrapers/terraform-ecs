@@ -237,12 +237,12 @@ In order to add this task in a pipeline you need to specify the following inputs
  * [`ami`] : The ami resource that we want to deploy
 
  You can customize your pipeline with the following params:
+ * [`AWS_ACCESS_KEY_ID`] : The key id to use to authenticate to AWS
+ * [`AWS_SECRET_ACCESS_KEY`] : The secret key to use to authenticate to AWS
  * [`TF_PROJECT_FOLDER`] : The folder that contains the ecs cluster definition
  * [`TF_VERSION`] : The terraform version of the project
  * [`AWS_DEFAULT_REGION`] : The AWS region where the ecs cluster has been deployed
- * [`ROLE_TO_ASSUME`] : The role to assume in order to run terraform
  * [`TIMEOUT`] : The time the script will wait for the container to migrate to the new instances
  * [`TF_ENVIRONMENT`] : The terraform workspace to target
- * [`AWS_ACCOUNT_ID`] : The account_id where the infra has been deployed
 
 An example of a concourse pipeline can be found in the [example pipeline](ci/ecs/sample.yml)

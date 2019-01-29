@@ -47,5 +47,6 @@ jobs:
           TF_PROJECT_FOLDER: stacks/ecs-cluster
           TF_ENVIRONMENT: production
           TF_VERSION: 0.11.7
-          AWS_ACCOUNT_ID: ((ACCOUNT_ID))
           TIMEOUT: 900
+          AWS_ACCESS_KEY_ID: (( AWS_CONCOURSE.key ))
+          AWS_SECRET_ACCESS_KEY: (( AWS_CONCOURSE.secret ))
