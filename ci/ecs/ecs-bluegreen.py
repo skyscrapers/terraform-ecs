@@ -10,10 +10,10 @@ import json
 
 
 def main(argv):
-    helptext = 'ecs-bluegreen.py -f <path to terraform project> -a <ami> -c <command> -t <timeout> -e <environment.tfvars> <path>'
+    helptext = 'ecs-bluegreen.py -f <path to terraform project> -a <ami> -c <command> -t <timeout> -e <environment.tfvars> [--role-arn <role arn to assume>]'
 
     try:
-        opts, args = getopt.getopt(argv, "hsrf:a:c:t:e:", ["folder=", "ami=", "command=", "timeout=", "environment="])
+        opts, args = getopt.getopt(argv, "hsrf:a:c:t:e:", ["folder=", "ami=", "command=", "timeout=", "environment=", "role-arn="])
     except getopt.GetoptError:
         print(helptext)
         sys.exit(2)
@@ -37,6 +37,8 @@ def main(argv):
                 stopScaling = True
             elif opt in ("-r","--force-recycle"):
                 forceRecycle = True
+            elif opt in ("--role-arn"):
+                assumeRoleArn = arg
     else:
         print(helptext)
         sys.exit(2)
@@ -65,6 +67,13 @@ def main(argv):
 
     if 'forceRecycle' not in locals():
         forceRecycle = False
+
+    if 'assumeRoleArn' not in locals():
+        assumeRoleArn = None
+
+    # Get a boto3 session
+    global awsSession
+    awsSession = getBotoSession(assumeRoleArn)
 
     # Retrieve autoscaling group names and ecs cluster info
     tf_output = getTerraformOutput(projectPath)
@@ -107,8 +116,27 @@ def main(argv):
         print('Deactivating the autoscaling')
         scaleDownAutoscaling(info, active, ami, command, projectPath, environment)
 
+def getBotoSession(assumeRoleArn):
+    if assumeRoleArn:
+        sts_client = boto3.client('sts')
+
+        # Call the assume_role method of the STSConnection object and pass the role
+        # ARN and a role session name.
+        assumed_role_object = sts_client.assume_role(
+            RoleArn = assumeRoleArn,
+            RoleSessionName = "bluegreen"
+        )
+
+        return boto3.Session(
+            aws_access_key_id = assumed_role_object['Credentials']['AccessKeyId'],
+            aws_secret_access_key = assumed_role_object['Credentials']['SecretAccessKey'],
+            aws_session_token = assumed_role_object['Credentials']['SessionToken'],
+        )
+    else:
+        return boto3.Session()
+
 def removeInstancesFromECS(old_asg,ecs_cluster,ecs_info,forceRecycle,maxTimeout=500):
-    client = boto3.client('ecs')
+    client = awsSession.client('ecs')
     ecs_instances_list = describeECSInstance(ecs_info['containerInstanceArns'],ecs_cluster)
     old_cluster_instance_ids = [ecs_instance['containerInstanceArn'] for ecs_instance in ecs_instances_list['containerInstances'] if ecs_instance['ec2InstanceId'] in [instance['InstanceId'] for instance in old_asg['Instances']]]
     response = client.update_container_instances_state(
@@ -140,7 +168,7 @@ def removeInstancesFromECS(old_asg,ecs_cluster,ecs_info,forceRecycle,maxTimeout=
         timeout=0
 
 def describeECSInstance(container_instance_ids,ecs_cluster):
-    client = boto3.client('ecs')
+    client = awsSession.client('ecs')
     response = client.describe_container_instances(
         cluster=ecs_cluster,
         containerInstances=container_instance_ids
@@ -148,7 +176,7 @@ def describeECSInstance(container_instance_ids,ecs_cluster):
     return response
 
 def getECSInfo(ecs_cluster):
-    client = boto3.client('ecs')
+    client = awsSession.client('ecs')
     response = client.list_container_instances(
         cluster=ecs_cluster
     )
@@ -169,7 +197,7 @@ def getTerraformOutput(projectPath, output=''):
         print(std_out)
 
 def getAutoscalingInfo(asgs):
-    client = boto3.client('autoscaling')
+    client = awsSession.client('autoscaling')
     response = client.describe_auto_scaling_groups(
         AutoScalingGroupNames=asgs,
         MaxRecords=2
@@ -178,7 +206,7 @@ def getAutoscalingInfo(asgs):
 
 
 def getAmi(launchconfig):
-    client = boto3.client('autoscaling')
+    client = awsSession.client('autoscaling')
     response = client.describe_launch_configurations(
         LaunchConfigurationNames=[
             launchconfig,
@@ -189,7 +217,7 @@ def getAmi(launchconfig):
 
 
 def getLaunchconfigDate(launchconfig):
-    client = boto3.client('autoscaling')
+    client = awsSession.client('autoscaling')
     response = client.describe_launch_configurations(
         LaunchConfigurationNames=[
             launchconfig,
