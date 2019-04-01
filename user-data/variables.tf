@@ -3,7 +3,7 @@ variable "project" {}
 variable "cluster_name" {}
 
 variable "teleport_version" {
-  default = "2.5.8"
+  default = "3.1.8"
 }
 
 variable "teleport_server" {

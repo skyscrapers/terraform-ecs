@@ -82,7 +82,7 @@ EOF
 }
 
 module "teleport_bootstrap_script" {
-  source       = "github.com/skyscrapers/terraform-teleport//teleport-bootstrap-script?ref=3.3.5"
+  source       = "github.com/skyscrapers/terraform-teleport//teleport-bootstrap-script?ref=3.3.6"
   auth_server  = "${var.teleport_server}"
   auth_token   = "${var.teleport_auth_token}"
   function     = "ecs"
