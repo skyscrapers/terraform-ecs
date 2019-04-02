@@ -80,6 +80,12 @@ resource "aws_ecs_service" "monitoring" {
   desired_count   = "${var.desired_count}"
   iam_role        = "${var.ecs_service_role}"
 
+  # In the current setup, Prometheus uses a single EFS file system
+  # across the entire ECS cluster, and it locks it via a lock-file,
+  # which means that there can only be one Prometheus container running
+  # simultaneously in the cluster.
+  deployment_minimum_healthy_percent = 0
+
   ordered_placement_strategy {
     type  = "spread"
     field = "host"
