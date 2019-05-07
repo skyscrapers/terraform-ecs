@@ -11,6 +11,13 @@ locals {
   static_configs:
     - targets: ['${var.concourse_url}:9391']
 EOF
+
+  es_monitor = <<EOF
+- job_name: 'elasticsearch'
+  scrape_interval: 15s
+  static_configs:
+    - targets: ['${var.aws_route53_record.elasticsearch_exporter}:${var.es_exporter_port}']
+EOF
 }
 
 data "template_file" "monitoring" {
@@ -49,6 +56,22 @@ data "template_file" "grafana" {
   }
 }
 
+data "template_file" "elasticsearch_exporter" {
+  template = "${file("${path.module}/task-definitions/grafana.json")}"
+
+  vars {
+    aws_region                     = "${data.aws_region.current.name}"
+    es_exporter_cpu                = "${var.es_exporter_cpu}"
+    es_exporter_memory             = "${var.es_exporter_memory}"
+    es_exporter_memory_reservation = "${var.es_exporter_memory_reservation}"
+    es_exporter_image              = "${var.es_exporter_image}"
+    es_exporter_image_version      = "${var.es_exporter_image_version}"
+    es_exporter_port               = "${var.es_web_path}"
+    es_exporter_path               = "${var.es_web_path}"
+    es_uri                         = "${var.es_uri}"
+    environment                    = "${var.environment}"
+  }
+}
 resource "aws_ecs_task_definition" "monitoring" {
   family                = "monitoring-${var.environment}"
   network_mode          = "bridge"
@@ -73,6 +96,13 @@ resource "aws_ecs_task_definition" "grafana" {
   }
 }
 
+resource "aws_ecs_task_definition" "elasticsearch_exporter" {
+  family                = "elasticsearch_exporter-${var.environment}"
+  network_mode          = "bridge"
+  container_definitions = "${data.template_file.elasticsearch_exporter.rendered}"
+  task_role_arn         = "${aws_iam_role.monitoring.arn}"
+
+}
 resource "aws_ecs_service" "monitoring" {
   name            = "monitoring"
   cluster         = "${var.cluster_name}"
@@ -114,6 +144,25 @@ resource "aws_ecs_service" "grafana" {
     target_group_arn = "${aws_lb_target_group.grafana.arn}"
     container_name   = "grafana"
     container_port   = "${var.grafana_port}"
+  }
+}
+
+resource "aws_ecs_service" "elasticsearch_exporter" {
+  name            = "elasticsearch_exporter"
+  cluster         = "${var.cluster_name}"
+  task_definition = "${aws_ecs_task_definition.elasticsearch_exporter.arn}"
+  desired_count   = "${var.desired_count}"
+  iam_role        = "${var.ecs_service_role}"
+
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "host"
+  }
+
+  load_balancer {
+    target_group_arn = "${aws_lb_target_group.elasticsearch_exporter.arn}"
+    container_name   = "elasticsearch_exporter"
+    container_port   = "${var.es_exporter_port}"
   }
 }
 
@@ -181,6 +230,36 @@ resource "aws_lb_listener_rule" "grafana" {
   }
 }
 
+resource "aws_lb_target_group" "elasticsearch_exporter" {
+  name     = "elasticsearch_exporter-${var.environment}"
+  port     = "${var.es_exporter_port}"
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    interval            = 30
+    path                = "/health"
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+  }
+}
+
+resource "aws_lb_listener_rule" "elasticsearch_exporter" {
+  listener_arn = "${module.alb_listener_monitoring.listener_id}"
+  priority     = 2
+
+  action {
+    type             = "forward"
+    target_group_arn = "${aws_lb_target_group.elasticsearch_exporter.arn}"
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["es_exporter.${var.r53_zone_prefix}${var.r53_zone}"]
+  }
+}
+
 data "aws_vpc" "current" {
   id = "${var.vpc_id}"
 }
@@ -231,6 +310,18 @@ resource "aws_route53_record" "monitoring" {
 resource "aws_route53_record" "grafana" {
   zone_id = "${data.aws_route53_zone.root.zone_id}"
   name    = "grafana.${var.r53_zone_prefix}${var.r53_zone}"
+  type    = "A"
+
+  alias {
+    name                   = "${data.aws_lb.alb.dns_name}"
+    zone_id                = "${data.aws_lb.alb.zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "elasticsearch_exporter" {
+  zone_id = "${data.aws_route53_zone.root.zone_id}"
+  name    = "es_exporter.${var.r53_zone_prefix}${var.r53_zone}"
   type    = "A"
 
   alias {
@@ -294,6 +385,7 @@ data template_file "prometheus_config" {
 
   vars {
     concourse_monitor = "${var.concourse_url == "" ? "": indent(2,local.concourse_monitor)}"
+    es_monitor        = "${var.enable_es_exporter ? indent(2,local.es_monitor) : ""}"
     custom_jobs       = "${indent(2,var.custom_jobs)}"
     environment       = "${var.environment}"
   }
