@@ -7,20 +7,18 @@
         "memory": ${es_exporter_memory},
         "memoryReservation": ${es_exporter_memory_reservation},
         "command": [
-          {
-            "elasticsearch_exporter",
-            "-es.uri=${es_uri}",
-            "-es.all=${es_all}",
-            "-es.indices=${es_indices}",
-            "-es.timeout=${es_timeout}",
-            "-web.listen-address=:${es_exporter_port}",
-            "-web.telemetry-path=${es_exporter_path}"
-          }
-          ],
+          "elasticsearch_exporter",
+          "-es.uri=${es_uri}",
+          "-es.all=${es_all}",
+          "-es.indices=${es_indices}",
+          "-es.timeout=${es_timeout}",
+          "-web.listen-address=:${es_exporter_port}",
+          "-web.telemetry-path=${es_exporter_path}"
+        ],
         "portMappings": [
           {
             "hostPort": ${es_exporter_port},
-            "containerPort": ${ex_exporter_port}
+            "containerPort": ${es_exporter_port}
           }
         ],
         "logConfiguration": {

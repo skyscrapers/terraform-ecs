@@ -60,7 +60,7 @@ data "template_file" "grafana" {
 
 data "template_file" "elasticsearch_exporter" {
   count    = "${var.enable_es_exporter ? 1 : 0}"
-  template = "${file("${path.module}/task-definitions/grafana.json")}"
+  template = "${file("${path.module}/task-definitions/elasticsearch_exporter.json")}"
 
   vars {
     aws_region                     = "${data.aws_region.current.name}"
@@ -71,6 +71,9 @@ data "template_file" "elasticsearch_exporter" {
     es_exporter_image_version      = "${var.es_exporter_image_version}"
     es_exporter_port               = "${var.es_exporter_port}"
     es_exporter_path               = "${var.es_exporter_path}"
+    es_all                         = "${var.es_monitor_all_nodes}"
+    es_indices                     = "${var.es_monitor_all_indices}"
+    es_timeout                     = "${var.es_exporter_timeout}"
     es_uri                         = "${var.es_uri}"
     environment                    = "${var.environment}"
   }
@@ -101,13 +104,13 @@ resource "aws_ecs_task_definition" "grafana" {
 }
 
 resource "aws_ecs_task_definition" "elasticsearch_exporter" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
+  #count                 = "${var.enable_es_exporter ? 1 : 0}"
   family                = "elasticsearch_exporter-${var.environment}"
   network_mode          = "bridge"
   container_definitions = "${data.template_file.elasticsearch_exporter.rendered}"
   task_role_arn         = "${aws_iam_role.monitoring.arn}"
-
 }
+
 resource "aws_ecs_service" "monitoring" {
   name            = "monitoring"
   cluster         = "${var.cluster_name}"
@@ -153,7 +156,7 @@ resource "aws_ecs_service" "grafana" {
 }
 
 resource "aws_ecs_service" "elasticsearch_exporter" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
+  count           = "${var.enable_es_exporter ? 1 : 0}"
   name            = "elasticsearch_exporter"
   cluster         = "${var.cluster_name}"
   task_definition = "${aws_ecs_task_definition.elasticsearch_exporter.arn}"
@@ -238,7 +241,7 @@ resource "aws_lb_listener_rule" "grafana" {
 
 resource "aws_lb_target_group" "elasticsearch_exporter" {
   count    = "${var.enable_es_exporter ? 1 : 0}"
-  name     = "elasticsearch_exporter-${var.environment}"
+  name     = "es-exporter-${var.environment}"
   port     = "${var.es_exporter_port}"
   protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
