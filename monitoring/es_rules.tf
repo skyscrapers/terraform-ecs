@@ -59,7 +59,7 @@ EOF
 
   elasticsearch_aws_rules = <<EOF
   - alert: ElasticsearchCloudwatchExporterDown
-    expr: up{job="cloudwatch != 1
+    expr: up{job="cloudwatch" != 1
     for: 5m
     labels:
       severity: critical

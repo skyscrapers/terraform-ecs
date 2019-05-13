@@ -133,6 +133,8 @@ variable "es_exporter_path" {
 
 variable "es_uri" {}
 
+variable "es_sg" {}
+
 variable "opsgenie_api_key" {}
 
 variable "slack_channel" {}
