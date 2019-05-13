@@ -63,4 +63,7 @@ groups:
     annotations:
       description: '{{$labels.instance}} is using more than 90% CPU for >1h '
       summary: Instance {{$labels.instance}} CPU usage high
+  ${elasticsearch_rules}
+  ${elasticsearch_additional_rules}
   ${custom_alert_rules}
+
