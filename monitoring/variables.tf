@@ -101,6 +101,38 @@ variable "cloudwatch_exporter_memory_reservation" {
   default = "100"
 }
 
+
+
+variable "es_exporter_cpu" {
+  default = "0"
+}
+
+variable "es_exporter_memory" {
+  default = "200"
+}
+
+variable "es_exporter_memory_reservation" {
+  default = "100"
+}
+
+variable "es_exporter_image" {
+  default = "justwatch/elasticsearch_exporter"
+}
+
+variable "es_exporter_image_version" {
+  default = "1.0.2"
+}
+
+variable "es_exporter_port" {
+  default = "9108"
+}
+
+variable "es_exporter_path" {
+  default = "/metrics"
+}
+
+variable "es_uri" {}
+
 variable "opsgenie_api_key" {}
 
 variable "slack_channel" {}

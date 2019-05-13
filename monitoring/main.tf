@@ -5,6 +5,7 @@ data "aws_route53_zone" "root" {
 data "aws_region" "current" {}
 
 locals {
+
   concourse_monitor = <<EOF
 - job_name: 'concourse'
   scrape_interval: 15s
@@ -18,125 +19,6 @@ EOF
   static_configs:
     - targets: ['${var.aws_route53_record.elasticsearch_exporter}:${var.es_exporter_port}']
 EOF
-
-  elasticsearch_rules = <<EOF
-  - alert: ElasticsearchExporterDown
-    expr: up{job="elasticsearch-exporter"} != 1
-    for: 5m
-    labels:
-      severity: critical
-      group: persistence
-    annotations:
-      description: 'The Elasticsearch metrics exporter for {{`{{ $labels.job }}`}} is down!'
-      summary: Elasticsearch monitoring is DOWN!
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchexporterdown'
-
-  - alert: ElasticsearchClusterHealthYellow
-    expr: elasticsearch_cluster_health_status{color="yellow", job="elasticsearch-exporter"} != 0
-    for: 5m
-    labels:
-      severity: warning
-      group: persistence
-    annotations:
-      description: 'Elasticsearch cluster health for {{`{{ $labels.cluster }}`}} is yellow.'
-      summary: Elasticsearch cluster is Yellow
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchclusterhealthyellow'
-  - alert: ElasticsearchClusterHealthRed
-    expr: elasticsearch_cluster_health_status{color="red", job="elasticsearch-exporter"} != 0
-    for: 5m
-    labels:
-      severity: critical
-      group: persistence
-    annotations:
-      description: 'Elasticsearch cluster health for {{`{{ $labels.cluster }}`}} is RED!'
-      summary: Elasticsearch cluster is RED!
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchclusterhealthred'
-
-  - alert: ElasticsearchClusterEndpointDown
-    expr: elasticsearch_cluster_health_up{job="elasticsearch-exporter"} != 1
-    for: 5m
-    labels:
-      severity: critical
-      group: persistence
-    annotations:
-      description: 'Elasticsearch cluster endpoint for {{`{{ $labels.cluster }}`}} is DOWN!'
-      summary: Elasticsearch cluster endpoint is DOWN!
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchclusterendpointdown'
-
-  - alert: ElasticsearchHeapTooHigh
-    expr: elasticsearch_jvm_memory_used_bytes{area="heap", job="elasticsearch-exporter"} / elasticsearch_jvm_memory_max_bytes{area="heap", job="elasticsearch-exporter"} > 0.9
-    for: 15m
-    labels:
-      severity: warning
-      group: persistence
-    annotations:
-      description: 'The JVM heap usage for Elasticsearch cluster {{`{{ $labels.cluster }}`}} on node {{`{{ $labels.node }}`}} has been over 90% for 15m'
-      summary: ElasticSearch heap usage is high
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchheaptoohigh'
-
-EOF
-
-  elasticsearch_aws_rules = <<EOF
-  - alert: ElasticsearchCloudwatchExporterDown
-    expr: up{job="cloudwatch != 1
-    for: 5m
-    labels:
-      severity: critical
-      group: persistence
-    annotations:
-      description: 'The Elasticsearch Cloudwatch metrics exporter for {{`{{ $labels.job }}`}} is down!'
-      summary: Elasticsearch monitoring is DOWN!
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchcloudwatchexporterdown'
-
-  - alert: ElasticsearchAWSLowDiskSpace
-    expr: sum(label_join(aws_es_free_storage_space_minimum{job="cloudwatch, "cluster", ":", "client_id", "domain_name")) by (cluster) / min(clamp_max(elasticsearch_filesystem_data_size_bytes{job="elasticsearch-exporter", es_data_node="true"}/1024/1024, 102400)) by (cluster) <= 0.1
-    for: 15m
-    labels:
-      severity: warning
-      group: persistence
-    annotations:
-      description: 'AWS Elasticsearch cluster {{`{{ $labels.cluster }}`}} is low on free disk space'
-      summary: AWS Elasticsearch low disk
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchawslowdiskspace'
-
-  - alert: ElasticsearchAWSNoDiskSpace
-    expr: sum(label_join(aws_es_free_storage_space_minimum{job="cloudwatch"}, "cluster", ":", "client_id", "domain_name")) by (cluster) / min(clamp_max(elasticsearch_filesystem_data_size_bytes{job="elasticsearch-exporter", es_data_node="true"}/1024/1024, 102400)) by (cluster) <= 0.05
-    for: 15m
-    labels:
-      severity: critical
-      group: persistence
-    annotations:
-      description: 'AWS Elasticsearch cluster {{`{{ $labels.cluster }}`}} has no free disk space'
-      summary: AWS Elasticsearch out of disk
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchawsnodiskspace'
-
-EOF
-  
-  elasticsearch_nonaws_rules = <<EOF
-  - alert: ElasticsearchLowDiskSpace
-    expr: elasticsearch_filesystem_data_available_bytes{job="elasticsearch-exporter"} / elasticsearch_filesystem_data_size_bytes{job="elasticsearch-exporter"} <= 0.1
-    for: 15m
-    labels:
-      severity: warning
-      group: persistence
-    annotations:
-      description: 'Elasticsearch node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is low on free disk space'
-      summary: Elasticsearch low disk
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchlowdiskspace'
-
-  - alert: ElasticsearchNoDiskSpace
-    expr: elasticsearch_filesystem_data_available_bytes{job="elasticsearch-exporter"} / elasticsearch_filesystem_data_size_bytes{job="elasticsearch-exporter"} <= 0.05
-    for: 15m
-    labels:
-      severity: critical
-      group: persistence
-    annotations:
-      description: 'Elasticsearch node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} has no free disk space'
-      summary: Elasticsearch out of disk
-      runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchnodiskspace'
-
-EOF
-
 
 }
 
@@ -187,12 +69,13 @@ data "template_file" "elasticsearch_exporter" {
     es_exporter_memory_reservation = "${var.es_exporter_memory_reservation}"
     es_exporter_image              = "${var.es_exporter_image}"
     es_exporter_image_version      = "${var.es_exporter_image_version}"
-    es_exporter_port               = "${var.es_web_path}"
-    es_exporter_path               = "${var.es_web_path}"
+    es_exporter_port               = "${var.es_exporter_port}"
+    es_exporter_path               = "${var.es_exporter_path}"
     es_uri                         = "${var.es_uri}"
     environment                    = "${var.environment}"
   }
 }
+
 resource "aws_ecs_task_definition" "monitoring" {
   family                = "monitoring-${var.environment}"
   network_mode          = "bridge"
@@ -414,6 +297,45 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
   protocol          = "tcp"
   security_group_id = "${var.ecs_sg}"
   self              = true
+}
+
+resource "aws_security_group_rule" "allow_es_exporter" {
+  count    = "${var.var.enable_es_exporter ? 1 : 0}"
+  type              = "ingress"
+  from_port         = "${var.es_exporter_port}"
+  to_port           = "${var.es_exporter_port}"
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+  self              = true
+}
+
+resource "aws_security_group_rule" "allow_es_exporter_out" {
+  count    = "${var.var.enable_es_exporter ? 1 : 0}"
+  type              = "egress"
+  from_port         = "${var.es_exporter_port}"
+  to_port           = "${var.es_exporter_port}"
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+}
+
+resource "aws_security_group_rule" "allow_es_external" {
+  count    = "${var.var.enable_es_exporter ? 1 : 0}"
+  type              = "ingress"
+  from_port         = "${var.es_exporter_port}"
+  to_port           = "${var.es_exporter_port}"
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+  source_security_group_id = "${var.es_sg}"
+}
+
+resource "aws_security_group_rule" "allow_es_external_out" {
+  count    = "${var.var.enable_es_exporter ? 1 : 0}"
+  type              = "egress"
+  from_port         = "${var.es_exporter_port}"
+  to_port           = "${var.es_exporter_port}"
+  protocol          = "tcp"
+  security_group_id = "${var.es_sg}"
+  source_security_group_id = "${var.ecs_sg}"
 }
 
 data "aws_lb" "alb" {
