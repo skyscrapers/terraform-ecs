@@ -16,7 +16,7 @@ EOF
 - job_name: 'elasticsearch-exporter'
   scrape_interval: 15s
   static_configs:
-    - targets: ['${aws_route53_record.elasticsearch_exporter.name}:${var.es_exporter_port}']
+    - targets: ['https://${aws_route53_record.elasticsearch_exporter.name}:${var."${var.prometheus_port}"}']
 EOF
 }
 
@@ -300,25 +300,6 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
   self              = true
 }
 
-resource "aws_security_group_rule" "allow_es_exporter" {
-  count             = "${var.enable_es_exporter ? 1 : 0}"
-  type              = "ingress"
-  from_port         = "${var.es_exporter_port}"
-  to_port           = "${var.es_exporter_port}"
-  protocol          = "tcp"
-  security_group_id = "${var.ecs_sg}"
-  self              = true
-}
-
-resource "aws_security_group_rule" "allow_es_exporter_out" {
-  count             = "${var.enable_es_exporter ? 1 : 0}"
-  type              = "egress"
-  from_port         = "${var.es_exporter_port}"
-  to_port           = "${var.es_exporter_port}"
-  protocol          = "tcp"
-  security_group_id = "${var.ecs_sg}"
-  self              = true
-}
 
 resource "aws_security_group_rule" "allow_es_external" {
   count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 1 : 0 : 0}"
