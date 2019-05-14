@@ -1,5 +1,4 @@
 locals {
-
   elasticsearch_rules = <<EOF
   - alert: ElasticsearchExporterDown
     expr: up{job="elasticsearch-exporter"} != 1
@@ -92,7 +91,7 @@ EOF
       runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchawsnodiskspace'
 
 EOF
-  
+
   elasticsearch_nonaws_rules = <<EOF
   - alert: ElasticsearchLowDiskSpace
     expr: elasticsearch_filesystem_data_available_bytes{job="elasticsearch-exporter"} / elasticsearch_filesystem_data_size_bytes{job="elasticsearch-exporter"} <= 0.1
@@ -117,6 +116,4 @@ EOF
       runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchnodiskspace'
 
 EOF
-
-
 }

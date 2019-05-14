@@ -105,8 +105,8 @@ variable "enable_es_exporter" {
   default = "false"
 }
 
-variable "aws_es" {
-  default = "false"
+variable "es_aws_arn" {
+  default = ""
 }
 
 variable "es_monitor_all_nodes" {
@@ -120,6 +120,7 @@ variable "es_monitor_all_indices" {
 variable "es_exporter_timeout" {
   default = "30s"
 }
+
 variable "es_exporter_cpu" {
   default = "0"
 }

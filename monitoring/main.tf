@@ -5,7 +5,6 @@ data "aws_route53_zone" "root" {
 data "aws_region" "current" {}
 
 locals {
-
   concourse_monitor = <<EOF
 - job_name: 'concourse'
   scrape_interval: 15s
@@ -19,7 +18,6 @@ EOF
   static_configs:
     - targets: ['${aws_route53_record.elasticsearch_exporter.name}:${var.es_exporter_port}']
 EOF
-
 }
 
 data "template_file" "monitoring" {
@@ -256,7 +254,7 @@ resource "aws_lb_target_group" "elasticsearch_exporter" {
 }
 
 resource "aws_lb_listener_rule" "elasticsearch_exporter" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
+  count        = "${var.enable_es_exporter ? 1 : 0}"
   listener_arn = "${module.alb_listener_monitoring.listener_id}"
   priority     = 2
 
@@ -303,7 +301,7 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
 }
 
 resource "aws_security_group_rule" "allow_es_exporter" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
+  count             = "${var.enable_es_exporter ? 1 : 0}"
   type              = "ingress"
   from_port         = "${var.es_exporter_port}"
   to_port           = "${var.es_exporter_port}"
@@ -313,7 +311,7 @@ resource "aws_security_group_rule" "allow_es_exporter" {
 }
 
 resource "aws_security_group_rule" "allow_es_exporter_out" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
+  count             = "${var.enable_es_exporter ? 1 : 0}"
   type              = "egress"
   from_port         = "${var.es_exporter_port}"
   to_port           = "${var.es_exporter_port}"
@@ -323,24 +321,23 @@ resource "aws_security_group_rule" "allow_es_exporter_out" {
 }
 
 resource "aws_security_group_rule" "allow_es_external" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
-  type              = "ingress"
-  from_port         = "${var.es_exporter_port}"
-  to_port           = "${var.es_exporter_port}"
-  protocol          = "tcp"
-  security_group_id = "${var.ecs_sg}"
+  count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 0 : 1 : 0}"
+  type                     = "ingress"
+  from_port                = "${var.es_exporter_port}"
+  to_port                  = "${var.es_exporter_port}"
+  protocol                 = "tcp"
+  security_group_id        = "${var.ecs_sg}"
   source_security_group_id = "${var.es_sg}"
 }
 
 resource "aws_security_group_rule" "allow_es_external_out" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
-  type              = "egress"
-  from_port         = "${var.es_exporter_port}"
-  to_port           = "${var.es_exporter_port}"
-  protocol          = "tcp"
-  security_group_id = "${var.es_sg}"
+  count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 0 : 1 : 0}"
+  type                     = "egress"
+  from_port                = "${var.es_exporter_port}"
+  to_port                  = "${var.es_exporter_port}"
+  protocol                 = "tcp"
+  security_group_id        = "${var.es_sg}"
   source_security_group_id = "${var.ecs_sg}"
-
 }
 
 data "aws_lb" "alb" {
@@ -372,7 +369,7 @@ resource "aws_route53_record" "grafana" {
 }
 
 resource "aws_route53_record" "elasticsearch_exporter" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
+  count   = "${var.enable_es_exporter ? 1 : 0}"
   zone_id = "${data.aws_route53_zone.root.zone_id}"
   name    = "es_exporter.${var.r53_zone_prefix}${var.r53_zone}"
   type    = "A"
@@ -408,9 +405,9 @@ data template_file "alert_rules" {
   template = "${file("${path.module}/templates/alert.rules")}"
 
   vars {
-    elasticsearch_rules  = "${var.enable_es_exporter ? indent(2,local.elasticsearch_rules) : ""}"    
-    elasticsearch_additional_rules = "${var.enable_es_exporter ? var.aws_es ? indent(2,local.elasticsearch_aws_rules) : indent(2,local.elasticsearch_nonaws_rules) : ""}"    
-    custom_alert_rules = "${indent(2,var.custom_alert_rules)}"
+    elasticsearch_rules            = "${var.enable_es_exporter ? indent(2,local.elasticsearch_rules) : ""}"
+    elasticsearch_additional_rules = "${var.enable_es_exporter ? var.es_aws_arn ? indent(2,local.elasticsearch_aws_rules) : indent(2,local.elasticsearch_nonaws_rules) : ""}"
+    custom_alert_rules             = "${indent(2,var.custom_alert_rules)}"
   }
 }
 
@@ -439,10 +436,10 @@ data template_file "prometheus_config" {
   template = "${file("${path.module}/templates/prometheus.yml")}"
 
   vars {
-    concourse_monitor      = "${var.concourse_url == "" ? "": indent(2,local.concourse_monitor)}"
-    elasticsearch_monitor  = "${var.enable_es_exporter ? indent(2,local.elasticsearch_monitor) : ""}"
-    custom_jobs            = "${indent(2,var.custom_jobs)}"
-    environment            = "${var.environment}"
+    concourse_monitor     = "${var.concourse_url == "" ? "": indent(2,local.concourse_monitor)}"
+    elasticsearch_monitor = "${var.enable_es_exporter ? indent(2,local.elasticsearch_monitor) : ""}"
+    custom_jobs           = "${indent(2,var.custom_jobs)}"
+    environment           = "${var.environment}"
   }
 }
 
