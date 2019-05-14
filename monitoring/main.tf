@@ -319,6 +319,7 @@ resource "aws_security_group_rule" "allow_es_exporter_out" {
   to_port           = "${var.es_exporter_port}"
   protocol          = "tcp"
   security_group_id = "${var.ecs_sg}"
+  self              = true
 }
 
 resource "aws_security_group_rule" "allow_es_external" {
@@ -339,6 +340,7 @@ resource "aws_security_group_rule" "allow_es_external_out" {
   protocol          = "tcp"
   security_group_id = "${var.es_sg}"
   source_security_group_id = "${var.ecs_sg}"
+
 }
 
 data "aws_lb" "alb" {

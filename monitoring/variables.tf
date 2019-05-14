@@ -148,9 +148,13 @@ variable "es_exporter_path" {
   default = "/metrics"
 }
 
-variable "es_uri" {}
+variable "es_uri" {
+  default = ""
+}
 
-variable "es_sg" {}
+variable "es_sg" {
+  default = ""
+}
 
 variable "opsgenie_api_key" {}
 
