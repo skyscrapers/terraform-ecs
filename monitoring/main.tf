@@ -102,7 +102,7 @@ resource "aws_ecs_task_definition" "grafana" {
 }
 
 resource "aws_ecs_task_definition" "elasticsearch_exporter" {
-  #count                 = "${var.enable_es_exporter ? 1 : 0}"
+  count                 = "${var.enable_es_exporter ? 1 : 0}"
   family                = "elasticsearch_exporter-${var.environment}"
   network_mode          = "bridge"
   container_definitions = "${data.template_file.elasticsearch_exporter.rendered}"
@@ -256,7 +256,7 @@ resource "aws_lb_target_group" "elasticsearch_exporter" {
 resource "aws_lb_listener_rule" "elasticsearch_exporter" {
   count        = "${var.enable_es_exporter ? 1 : 0}"
   listener_arn = "${module.alb_listener_monitoring.listener_id}"
-  priority     = 2
+  priority     = 3
 
   action {
     type             = "forward"
@@ -265,7 +265,7 @@ resource "aws_lb_listener_rule" "elasticsearch_exporter" {
 
   condition {
     field  = "host-header"
-    values = ["es_exporter.${var.r53_zone_prefix}${var.r53_zone}"]
+    values = ["es-exporter.${var.r53_zone_prefix}${var.r53_zone}"]
   }
 }
 
@@ -321,7 +321,7 @@ resource "aws_security_group_rule" "allow_es_exporter_out" {
 }
 
 resource "aws_security_group_rule" "allow_es_external" {
-  count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 0 : 1 : 0}"
+  count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 1 : 0 : 0}"
   type                     = "ingress"
   from_port                = "${var.es_exporter_port}"
   to_port                  = "${var.es_exporter_port}"
@@ -331,7 +331,7 @@ resource "aws_security_group_rule" "allow_es_external" {
 }
 
 resource "aws_security_group_rule" "allow_es_external_out" {
-  count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 0 : 1 : 0}"
+  count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 1 : 0 : 0}"
   type                     = "egress"
   from_port                = "${var.es_exporter_port}"
   to_port                  = "${var.es_exporter_port}"
@@ -371,7 +371,7 @@ resource "aws_route53_record" "grafana" {
 resource "aws_route53_record" "elasticsearch_exporter" {
   count   = "${var.enable_es_exporter ? 1 : 0}"
   zone_id = "${data.aws_route53_zone.root.zone_id}"
-  name    = "es_exporter.${var.r53_zone_prefix}${var.r53_zone}"
+  name    = "es-exporter.${var.r53_zone_prefix}${var.r53_zone}"
   type    = "A"
 
   alias {
@@ -406,7 +406,7 @@ data template_file "alert_rules" {
 
   vars {
     elasticsearch_rules            = "${var.enable_es_exporter ? indent(2,local.elasticsearch_rules) : ""}"
-    elasticsearch_additional_rules = "${var.enable_es_exporter ? var.es_aws_arn ? indent(2,local.elasticsearch_aws_rules) : indent(2,local.elasticsearch_nonaws_rules) : ""}"
+    elasticsearch_additional_rules = "${var.enable_es_exporter ? var.es_aws_arn == "" ? indent(2,local.elasticsearch_nonaws_rules) : indent(2,local.elasticsearch_aws_rules) : ""}"
     custom_alert_rules             = "${indent(2,var.custom_alert_rules)}"
   }
 }

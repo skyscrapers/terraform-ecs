@@ -1,7 +1,7 @@
 [
       {
         "name": "elasticsearch_exporter",
-        "image": "{es_exporter_image}:${es_exporter_image_version}",
+        "image": "${es_exporter_image}:${es_exporter_image_version}",
         "essential": true,
         "cpu": ${es_exporter_cpu},
         "memory": ${es_exporter_memory},
