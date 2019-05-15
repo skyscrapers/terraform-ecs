@@ -15,8 +15,9 @@ EOF
   elasticsearch_monitor = <<EOF
 - job_name: 'elasticsearch-exporter'
   scrape_interval: 15s
+  scheme: https
   static_configs:
-    - targets: ['https://${aws_route53_record.elasticsearch_exporter.name}:${var."${var.prometheus_port}"}']
+    - targets: ['${aws_route53_record.elasticsearch_exporter.name}:${var.prometheus_port}']
 EOF
 }
 
