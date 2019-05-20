@@ -22,9 +22,7 @@ EOF
 
   elasticsearch_monitring_template = "[${data.template_file.elasticsearch_exporter.rendered}${data.template_file.monitoring.rendered}]"
 
-
   monitring_template = "[${data.template_file.monitoring.rendered}]"
-
 }
 
 data "template_file" "monitoring" {
@@ -246,8 +244,28 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
   self              = true
 }
 
+resource "aws_security_group_rule" "allow_es_exporter" {
+  count             = "${var.enable_es_exporter ? 1 : 0 }"
+  type              = "ingress"
+  from_port         = "${var.es_exporter_port}"
+  to_port           = "${var.es_exporter_port}"
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+  self              = true
+}
+
+resource "aws_security_group_rule" "allow_es_exporter_out" {
+  count             = "${var.enable_es_exporter ? 1 : 0 }"
+  type              = "egress"
+  from_port         = "${var.es_exporter_port}"
+  to_port           = "${var.es_exporter_port}"
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+  self              = true
+}
+
 resource "aws_security_group_rule" "allow_es_external" {
-  count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 1 : 0 : 0}"
+  count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 0 : 1 : 0}"
   type                     = "ingress"
   from_port                = "${var.es_exporter_port}"
   to_port                  = "${var.es_exporter_port}"
@@ -293,7 +311,6 @@ resource "aws_route53_record" "grafana" {
     evaluate_target_health = false
   }
 }
-
 
 resource "aws_cloudwatch_log_group" "cwlogs" {
   name              = "monitoring-${var.environment}"
