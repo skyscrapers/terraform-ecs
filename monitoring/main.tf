@@ -84,7 +84,7 @@ data "template_file" "elasticsearch_exporter" {
 resource "aws_ecs_task_definition" "monitoring" {
   family                = "monitoring-${var.environment}"
   network_mode          = "bridge"
-  container_definitions = "${var.enable_es_exporter_joined ? local.elasticsearch_monitring_template : local.monitring_template}"
+  container_definitions = "${var.enable_es_exporter ? local.elasticsearch_monitring_template : local.monitring_template}"
   task_role_arn         = "${aws_iam_role.monitoring.arn}"
 
   volume {
