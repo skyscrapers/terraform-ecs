@@ -1,4 +1,3 @@
-[
       {
         "name":"s3_download",
         "image": "mesosphere/aws-cli:latest",
@@ -122,4 +121,3 @@
           }
         }
       }
-]

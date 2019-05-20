@@ -17,8 +17,14 @@ EOF
   scrape_interval: 15s
   scheme: https
   static_configs:
-    - targets: ['${aws_route53_record.elasticsearch_exporter.name}:${var.prometheus_port}']
+    - targets: ['elasticsearch_exporter:${var.es_exporter_port}']
 EOF
+
+  elasticsearch_monitring_template = "[${data.template_file.elasticsearch_exporter.rendered}${data.template_file.monitoring.rendered}]"
+
+
+  monitring_template = "[${data.template_file.monitoring.rendered}]"
+
 }
 
 data "template_file" "monitoring" {
@@ -58,7 +64,6 @@ data "template_file" "grafana" {
 }
 
 data "template_file" "elasticsearch_exporter" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
   template = "${file("${path.module}/task-definitions/elasticsearch_exporter.json")}"
 
   vars {
@@ -81,7 +86,7 @@ data "template_file" "elasticsearch_exporter" {
 resource "aws_ecs_task_definition" "monitoring" {
   family                = "monitoring-${var.environment}"
   network_mode          = "bridge"
-  container_definitions = "${data.template_file.monitoring.rendered}"
+  container_definitions = "${var.enable_es_exporter_joined ? local.elasticsearch_monitring_template : local.monitring_template}"
   task_role_arn         = "${aws_iam_role.monitoring.arn}"
 
   volume {
@@ -100,14 +105,6 @@ resource "aws_ecs_task_definition" "grafana" {
     name      = "grafana"
     host_path = "${var.mount_point}/grafana"
   }
-}
-
-resource "aws_ecs_task_definition" "elasticsearch_exporter" {
-  count                 = "${var.enable_es_exporter ? 1 : 0}"
-  family                = "elasticsearch_exporter-${var.environment}"
-  network_mode          = "bridge"
-  container_definitions = "${data.template_file.elasticsearch_exporter.rendered}"
-  task_role_arn         = "${aws_iam_role.monitoring.arn}"
 }
 
 resource "aws_ecs_service" "monitoring" {
@@ -151,26 +148,6 @@ resource "aws_ecs_service" "grafana" {
     target_group_arn = "${aws_lb_target_group.grafana.arn}"
     container_name   = "grafana"
     container_port   = "${var.grafana_port}"
-  }
-}
-
-resource "aws_ecs_service" "elasticsearch_exporter" {
-  count           = "${var.enable_es_exporter ? 1 : 0}"
-  name            = "elasticsearch_exporter"
-  cluster         = "${var.cluster_name}"
-  task_definition = "${aws_ecs_task_definition.elasticsearch_exporter.arn}"
-  desired_count   = "${var.desired_count}"
-  iam_role        = "${var.ecs_service_role}"
-
-  ordered_placement_strategy {
-    type  = "spread"
-    field = "host"
-  }
-
-  load_balancer {
-    target_group_arn = "${aws_lb_target_group.elasticsearch_exporter.arn}"
-    container_name   = "elasticsearch_exporter"
-    container_port   = "${var.es_exporter_port}"
   }
 }
 
@@ -238,38 +215,6 @@ resource "aws_lb_listener_rule" "grafana" {
   }
 }
 
-resource "aws_lb_target_group" "elasticsearch_exporter" {
-  count    = "${var.enable_es_exporter ? 1 : 0}"
-  name     = "es-exporter-${var.environment}"
-  port     = "${var.es_exporter_port}"
-  protocol = "HTTP"
-  vpc_id   = "${var.vpc_id}"
-
-  health_check {
-    interval            = 30
-    path                = "/health"
-    timeout             = 5
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-  }
-}
-
-resource "aws_lb_listener_rule" "elasticsearch_exporter" {
-  count        = "${var.enable_es_exporter ? 1 : 0}"
-  listener_arn = "${module.alb_listener_monitoring.listener_id}"
-  priority     = 3
-
-  action {
-    type             = "forward"
-    target_group_arn = "${aws_lb_target_group.elasticsearch_exporter.arn}"
-  }
-
-  condition {
-    field  = "host-header"
-    values = ["es-exporter.${var.r53_zone_prefix}${var.r53_zone}"]
-  }
-}
-
 data "aws_vpc" "current" {
   id = "${var.vpc_id}"
 }
@@ -300,7 +245,6 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
   security_group_id = "${var.ecs_sg}"
   self              = true
 }
-
 
 resource "aws_security_group_rule" "allow_es_external" {
   count                    = "${var.enable_es_exporter ? var.es_aws_arn == "" ? 1 : 0 : 0}"
@@ -350,18 +294,6 @@ resource "aws_route53_record" "grafana" {
   }
 }
 
-resource "aws_route53_record" "elasticsearch_exporter" {
-  count   = "${var.enable_es_exporter ? 1 : 0}"
-  zone_id = "${data.aws_route53_zone.root.zone_id}"
-  name    = "es-exporter.${var.r53_zone_prefix}${var.r53_zone}"
-  type    = "A"
-
-  alias {
-    name                   = "${data.aws_lb.alb.dns_name}"
-    zone_id                = "${data.aws_lb.alb.zone_id}"
-    evaluate_target_health = false
-  }
-}
 
 resource "aws_cloudwatch_log_group" "cwlogs" {
   name              = "monitoring-${var.environment}"
