@@ -38,30 +38,3 @@ resource "aws_iam_role_policy_attachment" "monitoring" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
-data "aws_iam_policy_document" "es_exporter_policy" {
-  count = "${var.es_aws_arn == "" ? 0 : 1}"
-
-  statement {
-    actions = [
-      "es:Describe*",
-      "es:List*",
-      "es:ESHttpGet",
-    ]
-
-    resources = [
-      "${var.es_aws_arn}",
-    ]
-  }
-}
-
-resource "aws_iam_policy" "es_exporter_policy" {
-  count  = "${var.es_aws_arn == "" ? 0 : 1}"
-  name   = "es_exporter_policy_${terraform.workspace}"
-  policy = "${data.aws_iam_policy_document.es_exporter_policy.json}"
-}
-
-resource "aws_iam_role_policy_attachment" "es_exporter_policy_attachment" {
-  count      = "${var.es_aws_arn == "" ? 0 : 1}"
-  role       = "${aws_iam_role.monitoring.id}"
-  policy_arn = "${aws_iam_policy.es_exporter_policy.arn}"
-}

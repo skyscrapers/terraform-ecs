@@ -56,7 +56,7 @@ EOF
 
   elasticsearch_aws_rules = <<EOF
 - alert: ElasticsearchCloudwatchExporterDown
-  expr: up{job="cloudwatch" != 1
+  expr: up{job="cloudwatch"} != 1
   for: 5m
   labels:
     severity: critical
@@ -66,7 +66,7 @@ EOF
     summary: Elasticsearch monitoring is DOWN!
     runbook_url: 'https://github.com/skyscrapers/documentation/tree/master/runbook.md#alert-name-elasticsearchcloudwatchexporterdown'
 - alert: ElasticsearchAWSLowDiskSpace
-  expr: sum(label_join(aws_es_free_storage_space_minimum{job="cloudwatch", "cluster", ":", "client_id", "domain_name")) by (cluster) / min(clamp_max(elasticsearch_filesystem_data_size_bytes{job="elasticsearch-exporter", es_data_node="true"}/1024/1024, 102400)) by (cluster) <= 0.1
+  expr: sum(label_join(aws_es_free_storage_space_minimum{job="cloudwatch"}, "cluster", ":", "client_id", "domain_name")) by (cluster) / min(clamp_max(elasticsearch_filesystem_data_size_bytes{job="elasticsearch-exporter", es_data_node="true"}/1024/1024, 102400)) by (cluster) <= 0.1
   for: 15m
   labels:
     severity: warning
