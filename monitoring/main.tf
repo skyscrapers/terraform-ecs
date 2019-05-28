@@ -19,6 +19,14 @@ EOF
     - targets: ['elasticsearch_exporter:${var.es_exporter_port}']
 EOF
 
+  cloudwatch_elasticsearch_metrics = <<EOF
+- aws_namespace: AWS/ES
+  aws_metric_name: FreeStorageSpace
+  aws_dimensions: [ClientId, DomainName]
+  aws_dimension_select:
+    DomainName: [${var.es_aws_domain_name}]
+  aws_statistics: [Minimum, Maximum, Average, Sum]
+
   elasticsearch_monitring_template = "[${data.template_file.elasticsearch_exporter.rendered}${data.template_file.monitoring.rendered}]"
 
   monitring_template = "[${data.template_file.monitoring.rendered}]"
@@ -243,7 +251,7 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
   self              = true
 }
 
-resource "aws_security_group_rule" "allow_es_exporter" {
+resource "aws_security_group_rule" "allow_es_exporter_ecs" {
   count             = "${var.enable_es_exporter ? 1 : 0 }"
   type              = "ingress"
   from_port         = "${var.es_exporter_port}"
@@ -253,7 +261,7 @@ resource "aws_security_group_rule" "allow_es_exporter" {
   self              = true
 }
 
-resource "aws_security_group_rule" "allow_es_exporter_out" {
+resource "aws_security_group_rule" "allow_es_exporter_ecs_out" {
   count             = "${var.enable_es_exporter ? 1 : 0 }"
   type              = "egress"
   from_port         = "${var.es_exporter_port}"
@@ -263,7 +271,7 @@ resource "aws_security_group_rule" "allow_es_exporter_out" {
   self              = true
 }
 
-resource "aws_security_group_rule" "allow_es_external" {
+resource "aws_security_group_rule" "allow_es_exportor_external" {
   count                    = "${var.enable_es_exporter ? 1 : 0 }"
   type                     = "ingress"
   from_port                = "${var.es_exporter_port}"
@@ -273,7 +281,7 @@ resource "aws_security_group_rule" "allow_es_external" {
   source_security_group_id = "${var.es_sg}"
 }
 
-resource "aws_security_group_rule" "allow_es_external_out" {
+resource "aws_security_group_rule" "allow_es_exprtor_external_out" {
   count                    = "${var.enable_es_exporter ? 1 : 0}"
   type                     = "egress"
   from_port                = "${var.es_exporter_port}"
@@ -336,7 +344,7 @@ data template_file "alert_rules" {
 
   vars {
     elasticsearch_rules            = "${var.enable_es_exporter ? indent(2,local.elasticsearch_rules) : ""}"
-    elasticsearch_additional_rules = "${var.enable_es_exporter ? var.es_aws_arn == "" ? indent(2,local.elasticsearch_nonaws_rules) : indent(2,local.elasticsearch_aws_rules) : ""}"
+    elasticsearch_additional_rules = "${var.enable_es_exporter ? var.es_aws_domain == "" ? indent(2,local.elasticsearch_nonaws_rules) : indent(2,local.elasticsearch_aws_rules) : ""}"
     custom_alert_rules             = "${indent(2,var.custom_alert_rules)}"
   }
 }
@@ -359,6 +367,8 @@ data template_file "cloudwatch_exporter_config" {
 
   vars {
     cloudwatch_metrics = "${indent(2,var.cloudwatch_metrics)}"
+    cloudwatch_elasticsearch_metrics  = "${var.es_aws_domain == "" ? "" : indent(2,local.cloudwatch_elasticsearch_metrics) }"
+
   }
 }
 

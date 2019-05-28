@@ -105,7 +105,7 @@ variable "enable_es_exporter" {
   default = "false"
 }
 
-variable "es_aws_arn" {
+variable "es_aws_domain" {
   default = ""
 }
 
