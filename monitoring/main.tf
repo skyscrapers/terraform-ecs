@@ -26,6 +26,7 @@ EOF
   aws_dimension_select:
     DomainName: [${var.es_aws_domain_name}]
   aws_statistics: [Minimum, Maximum, Average, Sum]
+EOF
 
   elasticsearch_monitring_template = "[${data.template_file.elasticsearch_exporter.rendered}${data.template_file.monitoring.rendered}]"
 
@@ -366,9 +367,8 @@ data template_file "cloudwatch_exporter_config" {
   template = "${file("${path.module}/templates/cloudwatch_exporter.yml")}"
 
   vars {
-    cloudwatch_metrics = "${indent(2,var.cloudwatch_metrics)}"
-    cloudwatch_elasticsearch_metrics  = "${var.es_aws_domain == "" ? "" : indent(2,local.cloudwatch_elasticsearch_metrics) }"
-
+    cloudwatch_metrics               = "${indent(2,var.cloudwatch_metrics)}"
+    cloudwatch_elasticsearch_metrics = "${var.es_aws_domain == "" ? "" : indent(2,local.cloudwatch_elasticsearch_metrics) }"
   }
 }
 
