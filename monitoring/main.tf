@@ -24,7 +24,7 @@ EOF
   aws_metric_name: FreeStorageSpace
   aws_dimensions: [ClientId, DomainName]
   aws_dimension_select:
-    DomainName: [${var.es_aws_domain_name}]
+    DomainName: [${var.es_aws_domain}]
   aws_statistics: [Minimum, Maximum, Average, Sum]
 EOF
 
