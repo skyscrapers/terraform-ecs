@@ -40,10 +40,8 @@
           }
         ],
         "links": [
-          "alertmanager",
-	  "${additional_links}",
-	  "cloudwatch_exporter"
-        ],
+          ${container_links}
+	],
         "volumesFrom": [
           {
             "sourceContainer": "s3_download"

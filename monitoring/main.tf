@@ -31,6 +31,14 @@ EOF
   elasticsearch_monitring_template = "[${data.template_file.elasticsearch_exporter.rendered}${data.template_file.monitoring.rendered}]"
 
   monitring_template = "[${data.template_file.monitoring.rendered}]"
+
+  containers_links = <<EOF
+"alertmanager", "cloudwatch_exporter"
+EOF
+
+  containers_links_es = <<EOF
+"alertmanager", "elasticsearch_exporter", "cloudwatch_exporter"
+EOF
 }
 
 data "template_file" "monitoring" {
@@ -52,7 +60,7 @@ data "template_file" "monitoring" {
     cloudwatch_exporter_memory             = "${var.cloudwatch_exporter_memory}"
     cloudwatch_exporter_memory_reservation = "${var.cloudwatch_exporter_memory_reservation}"
     monitoring_configs_bucket              = "${aws_s3_bucket.monitoring_configs_bucket.id}"
-    additional_links                       = "s3_download"
+    container_links                        = "${var.enable_es_exporter ? local.containers_links_es : local.containers_links}"
   }
 }
 
