@@ -52,6 +52,7 @@ data "template_file" "monitoring" {
     cloudwatch_exporter_memory             = "${var.cloudwatch_exporter_memory}"
     cloudwatch_exporter_memory_reservation = "${var.cloudwatch_exporter_memory_reservation}"
     monitoring_configs_bucket              = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+    additional_links                       = "s3_download"
   }
 }
 

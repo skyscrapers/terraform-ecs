@@ -41,8 +41,8 @@
         ],
         "links": [
           "alertmanager",
-          "cloudwatch_exporter",
-	  "elasticsearch_exporter"
+	  "${additional_links}",
+	  "cloudwatch_exporter"
         ],
         "volumesFrom": [
           {
