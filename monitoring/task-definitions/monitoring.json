@@ -1,3 +1,4 @@
+{
       {
         "name":"s3_download",
         "image": "mesosphere/aws-cli:latest",
@@ -41,8 +42,7 @@
         ],
         "links": [
           "alertmanager",
-          "cloudwatch_exporter",
-	  "elasticsearch_exporter"
+          "cloudwatch_exporter"
         ],
         "volumesFrom": [
           {
@@ -121,4 +121,5 @@
             "awslogs-stream-prefix": "cloudwatch_exporter"
           }
         }
-      }
+      },
+}

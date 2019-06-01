@@ -92,7 +92,8 @@ data "template_file" "elasticsearch_exporter" {
 resource "aws_ecs_task_definition" "monitoring" {
   family                = "monitoring-${var.environment}"
   network_mode          = "bridge"
-  container_definitions = "${var.enable_es_exporter ? local.elasticsearch_monitring_template : local.monitring_template}"
+  container_definitions =  ${data.template_file.monitoring.rendered}"  
+  #container_definitions = "${var.enable_es_exporter ? local.elasticsearch_monitring_template : local.monitring_template}"
   task_role_arn         = "${aws_iam_role.monitoring.arn}"
 
   volume {
@@ -111,6 +112,15 @@ resource "aws_ecs_task_definition" "grafana" {
     name      = "grafana"
     host_path = "${var.mount_point}/grafana"
   }
+}
+
+resource "aws_ecs_task_definition" "elasticsearch_exporter" {
+  count                 = "${var.enable_es_exporter ? 1 : 0 }"
+  family                = "elasticsearch_exporter-${var.environment}"
+  network_mode          = "awsvpc"
+  container_definitions = "${data.template_file.elasticsearch_exporter.rendered}"
+  task_role_arn         = "${aws_iam_role.monitoring.arn}"
+
 }
 
 resource "aws_ecs_service" "monitoring" {
@@ -154,6 +164,26 @@ resource "aws_ecs_service" "grafana" {
     target_group_arn = "${aws_lb_target_group.grafana.arn}"
     container_name   = "grafana"
     container_port   = "${var.grafana_port}"
+  }
+}
+
+resource "aws_ecs_service" "elasticsearch_exporter" {
+  count           = "${var.enable_es_exporter ? 1 : 0 }"
+  name            = "elasticsearch_exporter"
+  cluster         = "${var.cluster_name}"
+  task_definition = "${aws_ecs_task_definition.elasticsearch_exporter.arn}"
+  desired_count   = "${var.desired_count}"
+  iam_role        = "${var.ecs_service_role}"
+
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "host"
+  }
+
+  network_configuration  {
+     subnets        =  ${var.private_app_subnets}
+     security_groups = ["${var.ecs_sg}"]
+
   }
 }
 
@@ -220,6 +250,8 @@ resource "aws_lb_listener_rule" "grafana" {
     values = ["grafana.${var.r53_zone_prefix}${var.r53_zone}"]
   }
 }
+
+
 
 data "aws_vpc" "current" {
   id = "${var.vpc_id}"
@@ -317,6 +349,18 @@ resource "aws_route53_record" "grafana" {
     name                   = "${data.aws_lb.alb.dns_name}"
     zone_id                = "${data.aws_lb.alb.zone_id}"
     evaluate_target_health = false
+  }
+}
+
+
+
+
+resource "aws_cloudwatch_log_group" "cwlogs" {
+  name              = "monitoring-${var.environment}"
+  retention_in_days = "14"
+
+  tags {
+    Environment = "${var.environment}"
   }
 }
 
