@@ -281,7 +281,7 @@ resource "aws_security_group_rule" "allow_es_exporter_ecs_out" {
   self              = true
 }
 
-resource "aws_security_group_rule" "allow_es_exportor_external" {
+resource "aws_security_group_rule" "allow_es_exporter_external" {
   count                    = "${var.enable_es_exporter ? 1 : 0 }"
   type                     = "ingress"
   from_port                = "${var.es_exporter_port}"
@@ -291,7 +291,7 @@ resource "aws_security_group_rule" "allow_es_exportor_external" {
   source_security_group_id = "${var.es_sg}"
 }
 
-resource "aws_security_group_rule" "allow_es_exprtor_external_out" {
+resource "aws_security_group_rule" "allow_es_exporter_external_out" {
   count                    = "${var.enable_es_exporter ? 1 : 0}"
   type                     = "egress"
   from_port                = "${var.es_exporter_port}"

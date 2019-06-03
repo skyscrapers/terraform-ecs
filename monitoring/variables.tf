@@ -102,7 +102,7 @@ variable "cloudwatch_exporter_memory_reservation" {
 }
 
 variable "enable_es_exporter" {
-  default = "false"
+  default = false
 }
 
 variable "es_aws_domain" {
