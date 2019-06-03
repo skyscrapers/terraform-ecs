@@ -138,6 +138,21 @@ EOF
  * [`alb_listener`]: The id of the ALB listener created for monitoring.
  * [`efs_mount_point`]: The mount point where we want to mount EFS in the ECS nodes.
  * [`efs_dns_name`]: The EFS DNS name
+ * [`enable_es_exporter`]: Boolean(optional): Enable elasticsearch exporter for monitoring an ES cluster. (default: false)
+ * [`es_exporter_image`]: String(optional): For elasticsearch monitoring, the URI of the docker image to use for the elasticsearch_exporter container (default: justwatch/elasticsearch_exporter)
+* [es_exporter_image_version]: String(optional): For elasticsearch monitoring, the docker image version to use for the elasticsearch_exporter container (default: 1.0.2)
+* [`es_exporter_port`]: String(optional): For elasticsearch monitoring, the port the elasticsearch exporter listens to (default: 9108)
+* [`es_exporter_path`]: String(optional): For elasticsearch monitoring, the path the elasticsearch exporter will ommit metrics to (default: /metrics) 
+ * [`es_monitor_all_nodes`]: Boolean(optional): For elasticsearch monitoring, If true, query stats for all nodes in the cluster, rather than just the exporter is connected to (default: true)
+ * [`es_monitor_all_indices`]: Boolean(optional): For elasticsearch monitoring, If true, query stats for all indices in the cluster (default: true)
+* [`es_exporter_timeout`]: String(optional): For elasticsearch monitoring, Timeout in seconds for trying to get stats from Elasticsearch (default: 30s)
+ * [`es_exporter_cpu`]: String(optional): The cpu dedicated to elasticsearch_exporter. (default: 0)
+ * [`es_exporter_memory`]: String(optional): The hard limit (in MiB) of memory to present to the container elasticsearch_exporter. (default: 200)
+ * [`es_exporter_memory_reservation`]: String(optional): The The soft limit (in MiB) of memory to reserve for the container elasticsearch_exporter. (default: 100)
+* [`es_uri`]: String(optional): Required if elasticsearch monitoring is enabled, endpoint (host and port) of the Elasticsearch node to be monitored (default: "")
+* [`es_sg`]: String(optional): Required if elasticsearch monitoring is enabled, Security Group of the Elasticsearch cluster to allow the elasticsearch exporter access to it. (default: 0)
+* [`es_aws_domain`]: String(optional): Required if monitoring an AWS Elasticsearch service cluster , the AWS Elasticsearch domain name, needed for special cloudwatch metrics. (default: "")
+
 
 ### Example
 ```
@@ -160,6 +175,10 @@ module "monitoring" {
   concourse_url       = "ci.example.com"
   efs_subnets         = ["subnet-12345678"]
   opsgenie_heartbeat  = "TestHeartbeat"
+  # Elasticsearch monitoring
+  enable_es_exporter = true
+  es_uri             = "http://${data.terraform_remote_state.static.elasticsearch_dns[0]}:9200"
+  es_sg              = "${data.terraform_remote_state.static.es_sg}"
 }
 ```
 

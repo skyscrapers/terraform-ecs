@@ -101,6 +101,62 @@ variable "cloudwatch_exporter_memory_reservation" {
   default = "100"
 }
 
+variable "enable_es_exporter" {
+  default = false
+}
+
+variable "es_aws_domain" {
+  default = ""
+}
+
+variable "es_monitor_all_nodes" {
+  default = true
+}
+
+variable "es_monitor_all_indices" {
+  default = true
+}
+
+variable "es_exporter_timeout" {
+  default = "30s"
+}
+
+variable "es_exporter_cpu" {
+  default = "0"
+}
+
+variable "es_exporter_memory" {
+  default = "200"
+}
+
+variable "es_exporter_memory_reservation" {
+  default = "100"
+}
+
+variable "es_exporter_image" {
+  default = "justwatch/elasticsearch_exporter"
+}
+
+variable "es_exporter_image_version" {
+  default = "1.0.2"
+}
+
+variable "es_exporter_port" {
+  default = "9108"
+}
+
+variable "es_exporter_path" {
+  default = "/metrics"
+}
+
+variable "es_uri" {
+  default = ""
+}
+
+variable "es_sg" {
+  default = ""
+}
+
 variable "opsgenie_api_key" {}
 
 variable "slack_channel" {}

@@ -11,6 +11,34 @@ locals {
   static_configs:
     - targets: ['${var.concourse_url}:9391']
 EOF
+
+  elasticsearch_monitor = <<EOF
+- job_name: 'elasticsearch-exporter'
+  scrape_interval: 15s
+  static_configs:
+    - targets: ['elasticsearch_exporter:${var.es_exporter_port}']
+EOF
+
+  cloudwatch_elasticsearch_metrics = <<EOF
+- aws_namespace: AWS/ES
+  aws_metric_name: FreeStorageSpace
+  aws_dimensions: [ClientId, DomainName]
+  aws_dimension_select:
+    DomainName: [${var.es_aws_domain}]
+  aws_statistics: [Minimum, Maximum, Average, Sum]
+EOF
+
+  elasticsearch_monitring_template = "[${data.template_file.elasticsearch_exporter.rendered}${data.template_file.monitoring.rendered}]"
+
+  monitring_template = "[${data.template_file.monitoring.rendered}]"
+
+  containers_links = <<EOF
+"alertmanager", "cloudwatch_exporter"
+EOF
+
+  containers_links_es = <<EOF
+"alertmanager", "elasticsearch_exporter", "cloudwatch_exporter"
+EOF
 }
 
 data "template_file" "monitoring" {
@@ -32,6 +60,7 @@ data "template_file" "monitoring" {
     cloudwatch_exporter_memory             = "${var.cloudwatch_exporter_memory}"
     cloudwatch_exporter_memory_reservation = "${var.cloudwatch_exporter_memory_reservation}"
     monitoring_configs_bucket              = "${aws_s3_bucket.monitoring_configs_bucket.id}"
+    container_links                        = "${var.enable_es_exporter ? local.containers_links_es : local.containers_links}"
   }
 }
 
@@ -49,10 +78,30 @@ data "template_file" "grafana" {
   }
 }
 
+data "template_file" "elasticsearch_exporter" {
+  template = "${file("${path.module}/task-definitions/elasticsearch_exporter.json")}"
+
+  vars {
+    aws_region                     = "${data.aws_region.current.name}"
+    es_exporter_cpu                = "${var.es_exporter_cpu}"
+    es_exporter_memory             = "${var.es_exporter_memory}"
+    es_exporter_memory_reservation = "${var.es_exporter_memory_reservation}"
+    es_exporter_image              = "${var.es_exporter_image}"
+    es_exporter_image_version      = "${var.es_exporter_image_version}"
+    es_exporter_port               = "${var.es_exporter_port}"
+    es_exporter_path               = "${var.es_exporter_path}"
+    es_all                         = "${var.es_monitor_all_nodes}"
+    es_indices                     = "${var.es_monitor_all_indices}"
+    es_timeout                     = "${var.es_exporter_timeout}"
+    es_uri                         = "${var.es_uri}"
+    environment                    = "${var.environment}"
+  }
+}
+
 resource "aws_ecs_task_definition" "monitoring" {
   family                = "monitoring-${var.environment}"
   network_mode          = "bridge"
-  container_definitions = "${data.template_file.monitoring.rendered}"
+  container_definitions = "${var.enable_es_exporter ? local.elasticsearch_monitring_template : local.monitring_template}"
   task_role_arn         = "${aws_iam_role.monitoring.arn}"
 
   volume {
@@ -212,6 +261,46 @@ resource "aws_security_group_rule" "allow_ecs_node_monitor_out" {
   self              = true
 }
 
+resource "aws_security_group_rule" "allow_es_exporter_ecs" {
+  count             = "${var.enable_es_exporter ? 1 : 0 }"
+  type              = "ingress"
+  from_port         = "${var.es_exporter_port}"
+  to_port           = "${var.es_exporter_port}"
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+  self              = true
+}
+
+resource "aws_security_group_rule" "allow_es_exporter_ecs_out" {
+  count             = "${var.enable_es_exporter ? 1 : 0 }"
+  type              = "egress"
+  from_port         = "${var.es_exporter_port}"
+  to_port           = "${var.es_exporter_port}"
+  protocol          = "tcp"
+  security_group_id = "${var.ecs_sg}"
+  self              = true
+}
+
+resource "aws_security_group_rule" "allow_es_exporter_external" {
+  count                    = "${var.enable_es_exporter ? 1 : 0 }"
+  type                     = "ingress"
+  from_port                = "${var.es_exporter_port}"
+  to_port                  = "${var.es_exporter_port}"
+  protocol                 = "tcp"
+  security_group_id        = "${var.ecs_sg}"
+  source_security_group_id = "${var.es_sg}"
+}
+
+resource "aws_security_group_rule" "allow_es_exporter_external_out" {
+  count                    = "${var.enable_es_exporter ? 1 : 0}"
+  type                     = "egress"
+  from_port                = "${var.es_exporter_port}"
+  to_port                  = "${var.es_exporter_port}"
+  protocol                 = "tcp"
+  security_group_id        = "${var.es_sg}"
+  source_security_group_id = "${var.ecs_sg}"
+}
+
 data "aws_lb" "alb" {
   arn = "${var.alb_arn}"
 }
@@ -264,7 +353,9 @@ data template_file "alert_rules" {
   template = "${file("${path.module}/templates/alert.rules")}"
 
   vars {
-    custom_alert_rules = "${indent(2,var.custom_alert_rules)}"
+    elasticsearch_rules            = "${var.enable_es_exporter ? indent(2,local.elasticsearch_rules) : ""}"
+    elasticsearch_additional_rules = "${var.enable_es_exporter ? var.es_aws_domain == "" ? indent(2,local.elasticsearch_nonaws_rules) : indent(2,local.elasticsearch_aws_rules) : ""}"
+    custom_alert_rules             = "${indent(2,var.custom_alert_rules)}"
   }
 }
 
@@ -285,7 +376,8 @@ data template_file "cloudwatch_exporter_config" {
   template = "${file("${path.module}/templates/cloudwatch_exporter.yml")}"
 
   vars {
-    cloudwatch_metrics = "${indent(2,var.cloudwatch_metrics)}"
+    cloudwatch_metrics               = "${indent(2,var.cloudwatch_metrics)}"
+    cloudwatch_elasticsearch_metrics = "${var.es_aws_domain == "" ? "" : indent(2,local.cloudwatch_elasticsearch_metrics) }"
   }
 }
 
@@ -293,9 +385,10 @@ data template_file "prometheus_config" {
   template = "${file("${path.module}/templates/prometheus.yml")}"
 
   vars {
-    concourse_monitor = "${var.concourse_url == "" ? "": indent(2,local.concourse_monitor)}"
-    custom_jobs       = "${indent(2,var.custom_jobs)}"
-    environment       = "${var.environment}"
+    concourse_monitor     = "${var.concourse_url == "" ? "": indent(2,local.concourse_monitor)}"
+    elasticsearch_monitor = "${var.enable_es_exporter ? indent(2,local.elasticsearch_monitor) : ""}"
+    custom_jobs           = "${indent(2,var.custom_jobs)}"
+    environment           = "${var.environment}"
   }
 }
 

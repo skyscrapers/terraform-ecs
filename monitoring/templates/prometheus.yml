@@ -38,6 +38,7 @@ scrape_configs:
           - name: "tag:Type"
             values: ["ecs-cluster"]
   ${concourse_monitor}
+  ${elasticsearch_monitor}
   - job_name: 'cloudwatch'
     scrape_interval: 1m
     static_configs:
