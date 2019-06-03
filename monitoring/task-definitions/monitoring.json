@@ -1,6 +1,6 @@
       {
         "name":"s3_download",
-        "image": "mesosphere/aws-cli:latest",
+        "image": "skyscrapers/awscli:latest",
         "essential": false,
         "memoryReservation": 100,
         "mountPoints": [
