@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_up_alarm" {
-  alarm_name          = "${terraform.env}-${var.cluster_name}-${var.service_name}-ECSServiceScaleUpAlarm"
+  alarm_name          = "${var.environment}-${var.cluster_name}-${var.service_name}-ECSServiceScaleUpAlarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = var.evaluation_periods
   metric_name         = "CPUUtilization"
@@ -19,7 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_up_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_service_scale_down_alarm" {
-  alarm_name          = "${terraform.env}-${var.cluster_name}-${var.service_name}-ECSServiceScaleDownAlarm"
+  alarm_name          = "${var.environment}-${var.cluster_name}-${var.service_name}-ECSServiceScaleDownAlarm"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = var.evaluation_periods
   metric_name         = "CPUUtilization"
@@ -48,7 +48,7 @@ resource "aws_appautoscaling_target" "ecs_target" {
 }
 
 resource "aws_appautoscaling_policy" "scale_down" {
-  name               = "${terraform.env}-${var.cluster_name}-${var.service_name}-scale-down"
+  name               = "${var.environment}-${var.cluster_name}-${var.service_name}-scale-down"
   resource_id        = "service/${var.cluster_name}/${var.service_name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
@@ -68,7 +68,7 @@ resource "aws_appautoscaling_policy" "scale_down" {
 }
 
 resource "aws_appautoscaling_policy" "scale_up" {
-  name               = "${terraform.env}-${var.cluster_name}-${var.service_name}-scale-up"
+  name               = "${var.environment}-${var.cluster_name}-${var.service_name}-scale-up"
   resource_id        = "service/${var.cluster_name}/${var.service_name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
@@ -86,4 +86,3 @@ resource "aws_appautoscaling_policy" "scale_up" {
 
   depends_on = [aws_appautoscaling_target.ecs_target]
 }
-

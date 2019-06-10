@@ -1,3 +1,7 @@
+variable "environment" {
+  description = "Environment it runs in"
+}
+
 variable "cluster_name" {
   description = "Name of the cluster"
 }
@@ -61,4 +65,3 @@ variable "datapoints_to_alarm_up" {
 variable "datapoints_to_alarm_down" {
   default = "4"
 }
-
