@@ -12,14 +12,15 @@ variable "project" {
 
 variable "security_groups" {
   default = []
-  type    = "list"
+  type    = list(string)
 }
 
 variable "subnets" {
-  type = "list"
+  type = list(string)
 }
 
 # value of 'count' cannot be computed
 variable "subnet_amount" {
-  type = "string"
+  type = string
 }
+

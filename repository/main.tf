@@ -1,10 +1,10 @@
 resource "aws_ecr_repository" "ecr-repo" {
-  name = "${var.repository_name}"
+  name = var.repository_name
 }
 
 resource "aws_ecr_lifecycle_policy" "ecr-repo-policy" {
-  count      = "${(var.expire_after == 0)? 0 : 1}"
-  repository = "${aws_ecr_repository.ecr-repo.name}"
+  count      = var.expire_after == 0 ? 0 : 1
+  repository = aws_ecr_repository.ecr-repo.name
 
   policy = <<EOF
 {
@@ -25,4 +25,6 @@ resource "aws_ecr_lifecycle_policy" "ecr-repo-policy" {
     ]
 }
 EOF
+
 }
+

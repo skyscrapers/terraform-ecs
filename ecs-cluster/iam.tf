@@ -4,7 +4,7 @@
 
 resource "aws_iam_instance_profile" "ecs-instance-profile" {
   name = "ecs-instance-profile-${var.environment}"
-  role = "${aws_iam_role.ecs-instance-role.name}"
+  role = aws_iam_role.ecs-instance-role.name
 }
 
 resource "aws_iam_role" "ecs-instance-role" {
@@ -25,10 +25,11 @@ resource "aws_iam_role" "ecs-instance-role" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-instance-role-policy-attach" {
-  role       = "${aws_iam_role.ecs-instance-role.name}"
+  role = aws_iam_role.ecs-instance-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
@@ -54,9 +55,11 @@ resource "aws_iam_role" "ecs-service-role" {
  ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-service-role-policy-attach" {
-  role       = "${aws_iam_role.ecs-service-role.name}"
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+role       = aws_iam_role.ecs-service-role.name
+policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
 }
+

@@ -1,10 +1,13 @@
 data "template_file" "node_exporter_service_cloudinit" {
-  template = "${file("${path.module}/templates/node-exporter.service.tpl")}"
+  template = file("${path.module}/templates/node-exporter.service.tpl")
 
-  vars {
-    node_exporter_service = "${indent(4,file("${path.module}/templates/node-exporter-upstart.conf"))}"
-    service_type_path     = "/etc/init.d/node_exporter"
-    file_permissions      = "0755"
+  vars = {
+    node_exporter_service = indent(
+      4,
+      file("${path.module}/templates/node-exporter-upstart.conf"),
+    )
+    service_type_path = "/etc/init.d/node_exporter"
+    file_permissions  = "0755"
   }
 }
 
@@ -31,6 +34,7 @@ ${module.teleport_bootstrap_script.teleport_config_cloudinit}
 ${module.teleport_bootstrap_script.teleport_service_cloudinit}
 ${data.template_file.node_exporter_service_cloudinit.rendered}
 EOF
+
   }
 
   part {
@@ -58,18 +62,19 @@ echo ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config
 start ecs
 service node_exporter start
 EOF
-  }
 
-  part {
-    content_type = "text/x-shellscript"
+}
 
-    content = "${module.teleport_bootstrap_script.teleport_bootstrap_script}"
-  }
+part {
+content_type = "text/x-shellscript"
 
-  part {
-    content_type = "text/cloud-config"
+content = module.teleport_bootstrap_script.teleport_bootstrap_script
+}
 
-    content = <<EOF
+part {
+content_type = "text/cloud-config"
+
+content = <<EOF
 packages:
 - nfs-utils
 runcmd:
@@ -78,15 +83,17 @@ runcmd:
 - mount -a -t nfs4
 - chmod -R 777 ${var.efs_mount_point}
 EOF
-  }
+
+}
 }
 
 module "teleport_bootstrap_script" {
-  source       = "github.com/skyscrapers/terraform-teleport//teleport-bootstrap-script?ref=3.3.6"
-  auth_server  = "${var.teleport_server}"
-  auth_token   = "${var.teleport_auth_token}"
-  function     = "ecs"
-  environment  = "${var.environment}"
-  project      = "${var.project}"
-  service_type = "upstart"
+source = "github.com/skyscrapers/terraform-teleport//teleport-bootstrap-script?ref=3.3.6"
+auth_server = var.teleport_server
+auth_token = var.teleport_auth_token
+function = "ecs"
+environment = var.environment
+project = var.project
+service_type = "upstart"
 }
+
