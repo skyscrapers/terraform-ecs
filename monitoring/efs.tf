@@ -27,7 +27,6 @@ module "efs_monitoring" {
   project         = var.project
   name            = "monitoring-${var.environment}"
   subnet_amount   = length(var.efs_subnets)
-  subnets         = [var.efs_subnets]
+  subnets         = var.efs_subnets
   security_groups = [aws_security_group.efs.id]
 }
-
