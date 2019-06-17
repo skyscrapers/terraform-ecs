@@ -1,9 +1,14 @@
-variable "environment" {}
-variable "project" {}
+variable "environment" {
+}
 
-variable "cluster_name" {}
+variable "project" {
+}
 
-variable "ecs_service_role" {}
+variable "cluster_name" {
+}
+
+variable "ecs_service_role" {
+}
 
 variable "desired_count" {
   default = "1"
@@ -13,11 +18,14 @@ variable "prometheus_port" {
   default = "9090"
 }
 
-variable "vpc_id" {}
+variable "vpc_id" {
+}
 
-variable "ecs_sg" {}
+variable "ecs_sg" {
+}
 
-variable "r53_zone" {}
+variable "r53_zone" {
+}
 
 variable "r53_zone_prefix" {
   default = ""
@@ -59,14 +67,17 @@ variable "cloudwatch_exporter_version" {
   default = "cloudwatch_exporter-0.5.0"
 }
 
-variable "alb_arn" {}
+variable "alb_arn" {
+}
 
-variable "alb_sg_id" {}
+variable "alb_sg_id" {
+}
 
-variable "alb_ssl_cert" {}
+variable "alb_ssl_cert" {
+}
 
 variable "source_subnet_cidrs" {
-  type = "list"
+  type = list(string)
 }
 
 variable "grafana_cpu" {
@@ -157,10 +168,14 @@ variable "es_sg" {
   default = ""
 }
 
-variable "opsgenie_api_key" {}
+variable "opsgenie_api_key" {
+}
 
-variable "slack_channel" {}
-variable "slack_url" {}
+variable "slack_channel" {
+}
+
+variable "slack_url" {
+}
 
 variable "custom_jobs" {
   default = ""
@@ -179,11 +194,13 @@ variable "custom_alert_rules" {
 }
 
 variable "efs_subnets" {
-  type = "list"
+  type = list(string)
 }
 
 variable "mount_point" {
   default = "/monitoring"
 }
 
-variable "opsgenie_heartbeat" {}
+variable "opsgenie_heartbeat" {
+}
+

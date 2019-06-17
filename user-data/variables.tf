@@ -1,6 +1,11 @@
-variable "environment" {}
-variable "project" {}
-variable "cluster_name" {}
+variable "environment" {
+}
+
+variable "project" {
+}
+
+variable "cluster_name" {
+}
 
 variable "teleport_version" {
   default = "3.1.8"
@@ -25,3 +30,4 @@ variable "efs_dns_name" {
 variable "node_exporter_version" {
   default = "0.16.0"
 }
+

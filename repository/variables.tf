@@ -6,3 +6,4 @@ variable "expire_after" {
   description = "Number of days after which untagged images in a repository will expire"
   default     = 30
 }
+

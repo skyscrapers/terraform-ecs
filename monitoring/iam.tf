@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "monitoring" {
 
 resource "aws_iam_role" "monitoring" {
   name               = "monitoring-task-role-${var.environment}"
-  assume_role_policy = "${data.aws_iam_policy_document.monitoring.json}"
+  assume_role_policy = data.aws_iam_policy_document.monitoring.json
 }
 
 data "aws_iam_policy_document" "s3_monitoring_config" {
@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "s3_monitoring_config" {
     effect  = "Allow"
 
     resources = [
-      "${aws_s3_bucket.monitoring_configs_bucket.arn}",
+      aws_s3_bucket.monitoring_configs_bucket.arn,
       "${aws_s3_bucket.monitoring_configs_bucket.arn}/*",
     ]
   }
@@ -29,11 +29,12 @@ data "aws_iam_policy_document" "s3_monitoring_config" {
 
 resource "aws_iam_role_policy" "s3_monitoring_config_policy" {
   name   = "s3-monitoring-config-${var.environment}"
-  role   = "${aws_iam_role.monitoring.id}"
-  policy = "${data.aws_iam_policy_document.s3_monitoring_config.json}"
+  role   = aws_iam_role.monitoring.id
+  policy = data.aws_iam_policy_document.s3_monitoring_config.json
 }
 
 resource "aws_iam_role_policy_attachment" "monitoring" {
-  role       = "${aws_iam_role.monitoring.id}"
+  role       = aws_iam_role.monitoring.id
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
+

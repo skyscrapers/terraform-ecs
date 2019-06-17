@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "ecr-repo-push" {
     ]
 
     resources = [
-      "${aws_ecr_repository.ecr-repo.arn}",
+      aws_ecr_repository.ecr-repo.arn,
     ]
   }
 }
@@ -30,7 +30,7 @@ resource "aws_iam_policy" "ecr-repo-push" {
   path        = "/"
   description = "Push access to the ${var.repository_name} repository"
 
-  policy = "${data.aws_iam_policy_document.ecr-repo-push.json}"
+  policy = data.aws_iam_policy_document.ecr-repo-push.json
 }
 
 data "aws_iam_policy_document" "ecr-repo-pull" {
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "ecr-repo-pull" {
     ]
 
     resources = [
-      "${aws_ecr_repository.ecr-repo.arn}",
+      aws_ecr_repository.ecr-repo.arn,
     ]
   }
 }
@@ -59,5 +59,6 @@ resource "aws_iam_policy" "ecr-repo-pull" {
   path        = "/"
   description = "Pull access to the ${var.repository_name} repository"
 
-  policy = "${data.aws_iam_policy_document.ecr-repo-pull.json}"
+  policy = data.aws_iam_policy_document.ecr-repo-pull.json
 }
+
