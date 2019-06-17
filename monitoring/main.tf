@@ -32,9 +32,9 @@ cloudwatch_elasticsearch_metrics = <<EOF
 EOF
 
 
-elasticsearch_monitring_template = "[${data.template_file.elasticsearch_exporter.rendered}${data.template_file.monitoring.rendered}]"
+elasticsearch_monitoring_template = "[${data.template_file.elasticsearch_exporter.rendered}${data.template_file.monitoring.rendered}]"
 
-monitring_template = "[${data.template_file.monitoring.rendered}]"
+monitoring_template = "[${data.template_file.monitoring.rendered}]"
 
 containers_links = <<EOF
 "alertmanager", "cloudwatch_exporter"
@@ -109,7 +109,7 @@ data "template_file" "elasticsearch_exporter" {
 resource "aws_ecs_task_definition" "monitoring" {
   family = "monitoring-${var.environment}"
   network_mode = "bridge"
-  container_definitions = var.enable_es_exporter ? local.elasticsearch_monitring_template : local.monitring_template
+  container_definitions = var.enable_es_exporter ? local.elasticsearch_monitoring_template : local.monitoring_template
   task_role_arn = aws_iam_role.monitoring.arn
 
   volume {
@@ -423,4 +423,3 @@ resource "aws_s3_bucket_object" "prometheus_config" {
   key = "prometheus.yml"
   content = data.template_file.prometheus_config.rendered
 }
-
