@@ -88,7 +88,7 @@ EOF
 }
 
 module "teleport_bootstrap_script" {
-source = "github.com/skyscrapers/terraform-teleport//teleport-bootstrap-script?ref=3.3.6"
+source = "github.com/skyscrapers/terraform-teleport//teleport-bootstrap-script?ref=5.0.0"
 auth_server = var.teleport_server
 auth_token = var.teleport_auth_token
 function = "ecs"
@@ -96,4 +96,3 @@ environment = var.environment
 project = var.project
 service_type = "upstart"
 }
-
