@@ -175,7 +175,7 @@ resource "aws_ecs_service" "grafana" {
 }
 
 module "alb_listener_monitoring" {
-  source = "github.com/skyscrapers/terraform-loadbalancers//alb_listener?ref=6.0.0"
+  source = "github.com/skyscrapers/terraform-loadbalancers//alb_listener?ref=7.0.0"
   environment = var.environment
   project = "monitoring"
   vpc_id = var.vpc_id
