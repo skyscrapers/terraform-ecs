@@ -2,11 +2,7 @@ data "template_file" "node_exporter_service_cloudinit" {
   template = file("${path.module}/templates/node-exporter.service.tpl")
 
   vars = {
-    node_exporter_service = indent(
-      4,
-      file("${path.module}/templates/node-exporter-upstart.conf"),
-    )
-    service_type_path = "/etc/init.d/node_exporter"
+    service_type_path = "/usr/lib/systemd/system/node_exporter.service"
     file_permissions  = "0755"
   }
 }
@@ -42,25 +38,27 @@ EOF
 
     content = <<EOF
 #!/bin/bash
-cd /tmp
-curl -L "https://get.gravitational.com/teleport-v${var.teleport_version}-linux-amd64-bin.tar.gz" > ./teleport.tar.gz
-sudo tar -xzf ./teleport.tar.gz
-sudo ./teleport/install
-
 # Prevent containers that use the bridge network mode from accessing the
 # credential information supplied to the container instance profile.
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html
 iptables --insert FORWARD 1 --in-interface docker+ --destination 169.254.169.254/32 --jump DROP
 service iptables save
+
+echo ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config
+start ecs
+
+cd /tmp
+curl -L "https://get.gravitational.com/teleport-v${var.teleport_version}-linux-amd64-bin.tar.gz" > ./teleport.tar.gz
+sudo tar -xzf ./teleport.tar.gz
+sudo ./teleport/install
 cd /opt
 curl -LO "https://github.com/prometheus/node_exporter/releases/download/v${var.node_exporter_version}/node_exporter-${var.node_exporter_version}.linux-amd64.tar.gz"
 tar -xzf node_exporter-${var.node_exporter_version}.linux-amd64.tar.gz
 mv node_exporter-${var.node_exporter_version}.linux-amd64/node_exporter /usr/local/bin/
 chmod +x /usr/local/bin/node_exporter
-
-echo ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config
-start ecs
-service node_exporter start
+systemctl daemon-reload
+systemctl enable node_exporter.service
+systemctl start node_exporter
 EOF
 
 }
