@@ -30,7 +30,6 @@ ${module.teleport_bootstrap_script.teleport_config_cloudinit}
 ${module.teleport_bootstrap_script.teleport_service_cloudinit}
 ${data.template_file.node_exporter_service_cloudinit.rendered}
 EOF
-
   }
 
   part {
@@ -60,19 +59,17 @@ systemctl daemon-reload
 systemctl enable node_exporter.service
 systemctl start node_exporter
 EOF
+  }
 
-}
+  part {
+    content_type = "text/x-shellscript"
+    content      = module.teleport_bootstrap_script.teleport_bootstrap_script
+  }
 
-part {
-content_type = "text/x-shellscript"
+  part {
+    content_type = "text/cloud-config"
 
-content = module.teleport_bootstrap_script.teleport_bootstrap_script
-}
-
-part {
-content_type = "text/cloud-config"
-
-content = <<EOF
+    content = <<EOF
 packages:
 - nfs-utils
 runcmd:
@@ -81,15 +78,14 @@ runcmd:
 - mount -a -t nfs4
 - chmod -R 777 ${var.efs_mount_point}
 EOF
-
-}
+  }
 }
 
 module "teleport_bootstrap_script" {
-source = "github.com/skyscrapers/terraform-teleport//teleport-bootstrap-script?ref=5.0.0"
-auth_server = var.teleport_server
-auth_token = var.teleport_auth_token
-function = "ecs"
-environment = var.environment
-project = var.project
+  source      = "github.com/skyscrapers/terraform-teleport//teleport-bootstrap-script?ref=5.0.1"
+  auth_server = var.teleport_server
+  auth_token  = var.teleport_auth_token
+  function    = "ecs"
+  environment = var.environment
+  project     = var.project
 }
