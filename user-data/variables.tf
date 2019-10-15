@@ -8,7 +8,7 @@ variable "cluster_name" {
 }
 
 variable "teleport_version" {
-  default = "3.1.8"
+  default = "4.1.1"
 }
 
 variable "teleport_server" {
@@ -30,4 +30,3 @@ variable "efs_dns_name" {
 variable "node_exporter_version" {
   default = "0.16.0"
 }
-

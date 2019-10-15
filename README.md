@@ -223,7 +223,7 @@ Setup a ECS cluster and service user-data.
  * [`project`]: String(optional): The project to tag EFS (default: "")
  * [`environment`]: String(required):  For what environment is this cluster needed (eg staging, production, ...)
  * [`cluster_name`]: String(required): The name of the ECS cluster.
- * [`teleport_version`]: String(optional): The version of Teleport to be used (default: 2.5.8).
+ * [`teleport_version`]: String(optional): The version of Teleport to be used (default: 4.1.1).
  * [`teleport_server`]: String(optional): the name of the teleport server to connect to(default: "")
  * [`teleport_auth_token`]: String(optional): Teleport server node token (default: "")
 
