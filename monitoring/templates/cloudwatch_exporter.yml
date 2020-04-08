@@ -1,7 +1,0 @@
----
-region: eu-west-1
-period_seconds: 60
-set_timestamp: false
-metrics:
-  ${cloudwatch_metrics}
-  ${cloudwatch_elasticsearch_metrics}
