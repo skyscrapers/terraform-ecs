@@ -4,7 +4,7 @@ image_resource:
   type: registry-image
   source:
     repository: "python"
-    tag: "3.8.7-alpine"
+    tag: "2.7.13-alpine"
 
 params:
   TF_PROJECT_FOLDER:
