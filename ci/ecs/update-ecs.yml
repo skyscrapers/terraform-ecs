@@ -1,10 +1,10 @@
 ---
 platform: linux
 image_resource:
-  type: docker-image
+  type: registry-image
   source:
     repository: "python"
-    tag: "2.7.13-alpine"
+    tag: "3.8.7-alpine"
 
 params:
   TF_PROJECT_FOLDER:
