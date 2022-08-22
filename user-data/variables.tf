@@ -8,7 +8,7 @@ variable "cluster_name" {
 }
 
 variable "teleport_version" {
-  default = "9.3.7"
+  default = "10.1.4"
 }
 
 variable "teleport_server" {
